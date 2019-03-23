@@ -33,6 +33,9 @@ set key as event reference
 ### User Flows
 
 - As a user I want to get a free ticket to an event
-- As a user I want to pay for a ticket to an event
-- As a user I want to resell my ticket for more than I bought it for
+- As a user I want to pay for one or more tickets to an event
+- As a user I want to resell my ticket(s) on a marketpalce for more than I bought it for by specifying the price
+- As a user I want to be able to send my ticket to someone else for free or for money
 - As an event owner I want to receive a cut from the resale of my tickets only if its over the original price
+- As a user I have to pay for the transaction fee (unless its a free event)
+- As a user I want to see all the offered tickets for any given event on the marketplace
