@@ -1,7 +1,7 @@
 package client
 
 import (
-	eventmakercmd "github.com/abcInfinity/tic_mark/x/eventmaker/client/cli"
+	eventmakercmd "github.com/marbar3778/tic_mark/x/eventmaker/client/cli"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/spf13/cobra"
 	amino "github.com/tendermint/go-amino"

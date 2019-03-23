@@ -1,4 +1,4 @@
-module github.com/abcInfinity/tic_mark
+module github.com/marbar3778/tic_mark
 
 go 1.12
 

@@ -3,7 +3,7 @@ package app
 import (
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/abcInfinity/tic_mark/x/eventmaker"
+	"github.com/marbar3778/tic_mark/x/eventmaker"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/abcInfinity/tic_mark/types"
+	"github.com/marbar3778/tic_mark/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

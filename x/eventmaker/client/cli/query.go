@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 
-	ticketTypes "github.com/abcInfinity/tic_mark/types"
+	ticketTypes "github.com/marbar3778/tic_mark/types"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/spf13/cobra"

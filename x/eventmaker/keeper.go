@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 
-	ticType "github.com/abcInfinity/tic_mark/types"
+	ticType "github.com/marbar3778/tic_mark/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
