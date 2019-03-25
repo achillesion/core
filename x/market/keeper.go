@@ -25,5 +25,9 @@ func NewKeeper(cKeeper bank.Keeper, eKey sdk.StoreKey, tKey sdk.StoreKey, mKey s
 	}
 }
 
-
-func (k Keeper) GetTicket
+// func (k Keeper) GetTicket
+// func (k Keeper) CreateTicket
+// func (k Keeper) MoveTicketResale
+// func (k Keeper) GetTickets within event
+// func (k Keeper) GetNewPrice
+// func (k Keeper) SellTicket

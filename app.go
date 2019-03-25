@@ -1,19 +1,22 @@
 package app
 
 import (
+	"encoding/json"
+
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/marbar3778/tic_mark/x/eventmaker"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/marbar3778/tic_mark/x/eventmaker"
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 const (
@@ -89,7 +92,7 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *EventMarketApp {
 	app.QueryRouter().
 		AddRoute("eventmaker", eventmaker.NewQuerier(app.tmKeeper))
 
-	app.SetInitChainer(app.initChain)
+	app.SetInitChainer(app.initChainer)
 
 	app.MountStores(
 		app.keyMain,
@@ -98,7 +101,7 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *EventMarketApp {
 		app.keyECM,
 		app.keyFeeCollection,
 		app.keyParams,
-		app.tkeyParams,
+		app.keyParams,
 	)
 
 	err := app.LoadLatestVersion(app.keyMain)
@@ -143,4 +146,34 @@ func (app *EventMarketApp) initChainer(ctx sdk.Context, req abci.RequestInitChai
 	bank.InitGenesis(ctx, app.bankKeeper, genesisState.BankData)
 
 	return abci.ResponseInitChain{}
+}
+
+func (app *EventMarketApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+	ctx := app.NewContext(true, abciHeader{})
+	accounts := []*auth.BaseAccount{}
+
+	appendAccountsFn := func(acc auth.Account) bool {
+		account := &auth.BaseAccount{
+			Address: acc.GetAddress(),
+			Coins:   acc.GetCoins(),
+		}
+
+		accounts = append(accounts, account)
+		return false
+	}
+
+	app.accountKeeper.IterateAccounts(ctx, appendAccountsFn)
+
+	genState := GenesisState{
+		Accounts: accounts,
+		AuthData: auth.DefaultGenesisState(),
+		BankData: bank.DefaultGenesisState(),
+	}
+
+	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return appState, validators, err
 }

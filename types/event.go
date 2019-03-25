@@ -7,11 +7,11 @@ import (
 )
 
 type TicketData struct {
-	InitialPrice  sdk.Coins `json:"ticket_price"`    // Price of this ticket
-	MarkUpAllowed int       `json:"mark_up_allowed"` // if ticket can be sold, what is max amount over originalPrice user can set per sale
-	TotalTickets  int       `json:"total_tickets"`   // Total amount of tickets
-	TicketsSold   int       `json:"tickets_sold"`    // amount of tickets sold
-	Resale        bool      `json:"resale"`          // Mark if secondary market is possible
+	InitialPrice  sdk.Coin `json:"ticket_price"`    // Price of this ticket
+	MarkUpAllowed int      `json:"mark_up_allowed"` // if ticket can be sold, what is max amount over originalPrice user can set per sale
+	TotalTickets  int      `json:"total_tickets"`   // Total amount of tickets
+	TicketsSold   int      `json:"tickets_sold"`    // amount of tickets sold
+	Resale        bool     `json:"resale"`          // Mark if secondary market is possible
 }
 
 type EventDetails struct {
@@ -58,7 +58,7 @@ func (e Event) ValidEventCreation() {
 
 // Eventdetails check
 func (e Event) EventDetails() string {
-	return fmt.Sprintf("Event name:%v, Total amount of tickets:%v, Event owner: %v", e.EventName, e.TicketData.TotalTickets, e.EventOwner)
+	return fmt.Sprintf("Event name:%s, Total amount of tickets:%d, Event owner: %s", e.EventName, e.TicketData.TotalTickets, e.EventOwner)
 }
 
 // GetTicketDetails - Get details of ticket to create tickets with
@@ -68,5 +68,10 @@ func (e Event) GetTicketDetails() TicketData {
 
 // GetEventDetails - get event details
 func (e Event) GetEventDetails() EventDetails {
+	return e.EventDetail
+}
+
+func (e Event) SetDate(date string) EventDetails {
+	e.EventDetail.Date = date
 	return e.EventDetail
 }

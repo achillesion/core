@@ -4,25 +4,25 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 
-	ticType "github.com/marbar3778/tic_mark/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	ticType "github.com/marbar3778/tic_mark/types"
 )
 
 // Keeper to house the events and tickets
 type Keeper struct {
-	coinKeeper     bank.Keeper
-	eventKey       sdk.StoreKey // store for upcoming and ongoing events
-	closedEventKey sdk.StoreKey // store for events that have passed
-	cdc            *codec.Codec
+	coinKeeper bank.Keeper
+	eKey       sdk.StoreKey // store for upcoming and ongoing events
+	cEKey      sdk.StoreKey // store for events that have passed
+	cdc        *codec.Codec
 }
 
 // NewKeeper : Generate a new keeper when called
 func NewKeeper(coinKeeper bank.Keeper, eventKey sdk.StoreKey, closedEventKey sdk.StoreKey, ticketStoreKey sdk.StoreKey, ban, cdc *codec.Codec) Keeper {
 	return Keeper{
-		coinKeeper:     coinKeeper,
-		eventKey:       eventKey,
-		closedEventKey: closedEventKey,
-		cdc:            cdc,
+		coinKeeper: coinKeeper,
+		eKey:       eventKey,
+		cEKey:      closedEventKey,
+		cdc:        cdc,
 	}
 }
 

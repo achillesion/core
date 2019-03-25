@@ -1,12 +1,14 @@
 package cli
 
 import (
+	"strconv"
+
 	"github.com/spf13/cobra"
 
-	"github.com/marbar3778/tic_mark/x/eventmaker"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/marbar3778/tic_mark/x/eventmaker"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
@@ -28,7 +30,22 @@ func GetCmdCreateEvent(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := eventmaker.NewMsgCreateEvent(args[0], args[1], args[2], args[3], cliCtx.GetFromAddress(), args[5])
+			num, err := strconv.Atoi(args[1])
+			if err != nil {
+				return err
+			}
+
+			num2, err := strconv.Atoi(args[2])
+			if err != nil {
+				return err
+			}
+
+			boo, err := strconv.ParseBool(args[5])
+			if err != nil {
+				return err
+			}
+
+			msg := eventmaker.NewMsgCreateEvent(args[0], num, num2, args[3], cliCtx.GetFromAddress(), boo)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -57,7 +74,12 @@ func GetCmdNewOwner(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := eventmaker.NewMsgNewOwner(args[0], cliCtx.GetFromAddress(), args[1], args[2])
+			addr, err := sdk.AccAddressFromBech32(args[1])
+			if err != nil {
+				return err
+			}
+
+			msg := eventmaker.NewMsgNewOwner(args[0], cliCtx.GetFromAddress(), addr, args[2])
 			err := msg.ValidateBasic()
 			if err != nil {
 				return err

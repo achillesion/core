@@ -10,6 +10,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.33.0
 	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d // indirect
 	github.com/cosmos/ledger-cosmos-go v0.9.8 // indirect
+	github.com/cosmos/sdk-application-tutorial v0.0.0-20190313150002-3616d9384466
 	github.com/ethereum/go-ethereum v1.8.23 // indirect
 	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/go-kit/kit v0.8.0 // indirect
@@ -26,10 +27,11 @@ require (
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/prometheus/client_golang v0.9.2 // indirect
+	github.com/rakyll/statik v0.1.6 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a // indirect
 	github.com/rs/cors v1.6.0 // indirect
 	github.com/spf13/cobra v0.0.3
-	github.com/spf13/viper v1.3.2 // indirect
+	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/tendermint/btcd v0.1.1 // indirect

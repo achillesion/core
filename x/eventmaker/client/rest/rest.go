@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/marbar3778/tic_mark/x/eventmaker"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	clientrest "github.com/cosmos/cosmos-sdk/client/rest"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/marbar3778/tic_mark/x/eventmaker"
 
 	"github.com/gorilla/mux"
 )
@@ -46,7 +46,7 @@ func createEventHandler(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		addr, err := sdk.AccAddressFromBech32(req.EventOwner)
+		addr, err := sdk.AccAddressFromBech32(req.EventOwnerAddress)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
