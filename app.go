@@ -149,7 +149,7 @@ func (app *EventMarketApp) initChainer(ctx sdk.Context, req abci.RequestInitChai
 }
 
 func (app *EventMarketApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
-	ctx := app.NewContext(true, abciHeader{})
+	ctx := app.NewContext(true, abci.Header{})
 	accounts := []*auth.BaseAccount{}
 
 	appendAccountsFn := func(acc auth.Account) bool {

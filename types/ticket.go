@@ -39,9 +39,9 @@ func NewTicket(ownerName string, ownerAddress sdk.AccAddress, parentReference st
 // Set new price
 func (t Ticket) SetNewPrice(oldPrice sdk.Coin, markUp int) sdk.Coin {
 
-	maxMarkUp := markUp / 100
-	markUpAmount := oldPrice.Amount * maxMarkUp
-	return markUpAmount
+	// maxMarkUp := markUp / 100
+	// markUpAmount := oldPrice.Amount * maxMarkUp
+	return oldPrice
 }
 
 // Get the new price of the ticket for resale

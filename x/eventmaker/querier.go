@@ -35,7 +35,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 func queryUpcomingEvent(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) (res []byte, err sdk.Error) {
 	event := path[0]
 
-	value := k.GetEvent(ctx, event, k.eventKey)
+	value := k.GetEvent(ctx, event, k.eKey)
 
 	bz, err2 := codec.MarshalJSONIndent(k.cdc, value)
 	if err2 != nil {
@@ -48,7 +48,7 @@ func queryUpcomingEvent(ctx sdk.Context, path []string, req abci.RequestQuery, k
 func queryClosedEvent(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) (res []byte, err sdk.Error) {
 	event := path[0]
 
-	value := k.GetEvent(ctx, event, k.closedEventKey)
+	value := k.GetEvent(ctx, event, k.cEKey)
 
 	bz, err2 := codec.MarshalJSONIndent(k.cdc, value)
 	if err2 != nil {
@@ -61,7 +61,7 @@ func queryClosedEvent(ctx sdk.Context, path []string, req abci.RequestQuery, k K
 func queryUpcomingEventNames(ctx sdk.Context, req abci.RequestQuery, k Keeper) (res []byte, err sdk.Error) {
 	var list []string
 
-	iterator := k.GetAllEvents(ctx, k.eventKey)
+	iterator := k.GetAllEvents(ctx, k.eKey)
 
 	for ; iterator.Valid(); iterator.Next() {
 		eventName := string(iterator.Key())
@@ -79,7 +79,7 @@ func queryUpcomingEventNames(ctx sdk.Context, req abci.RequestQuery, k Keeper) (
 func queryClosedEventNames(ctx sdk.Context, req abci.RequestQuery, k Keeper) (res []byte, err sdk.Error) {
 	var list []string
 
-	iterator := k.GetAllEvents(ctx, k.closedEventKey)
+	iterator := k.GetAllEvents(ctx, k.cEKey)
 
 	for ; iterator.Valid(); iterator.Next() {
 		eventName := string(iterator.Key())

@@ -17,7 +17,7 @@ type Keeper struct {
 }
 
 // NewKeeper : Generate a new keeper when called
-func NewKeeper(coinKeeper bank.Keeper, eventKey sdk.StoreKey, closedEventKey sdk.StoreKey, ticketStoreKey sdk.StoreKey, ban, cdc *codec.Codec) Keeper {
+func NewKeeper(coinKeeper bank.Keeper, eventKey sdk.StoreKey, closedEventKey sdk.StoreKey, cdc *codec.Codec) Keeper {
 	return Keeper{
 		coinKeeper: coinKeeper,
 		eKey:       eventKey,
@@ -39,7 +39,7 @@ func (k Keeper) GetEvent(ctx sdk.Context, eventName string, storekey sdk.StoreKe
 
 // GetEventOwner - Get the owner of the event
 func (k Keeper) GetEventOwner(ctx sdk.Context, eventName string) sdk.AccAddress {
-	eventData := k.GetEvent(ctx, eventName, k.eventKey)
+	eventData := k.GetEvent(ctx, eventName, k.eKey)
 	return eventData.EventOwnerAddress
 }
 
@@ -56,7 +56,7 @@ func (k Keeper) GetAllEvents(ctx sdk.Context, storeKey sdk.StoreKey) sdk.Iterato
 // SetEvent - Set event into store
 func (k Keeper) SetEvent(ctx sdk.Context, eventName string, eventData ticType.Event,
 	storeKey sdk.StoreKey) {
-	store := ctx.KVStore(k.eventKey)
+	store := ctx.KVStore(k.eKey)
 	store.Set([]byte(eventName), k.cdc.MustMarshalBinaryBare(eventData))
 }
 
@@ -68,18 +68,18 @@ func (k Keeper) DeleteEvent(ctx sdk.Context, eventName string, storeKey sdk.Stor
 
 // CloseEvent - Take event from actice events and place in inactive event store
 func (k Keeper) CloseEvent(ctx sdk.Context, eventName string) {
-	eventData := k.GetEvent(ctx, eventName, k.eventKey)
-	k.SetEvent(ctx, eventName, eventData, k.closedEventKey)
-	k.DeleteEvent(ctx, eventName, k.eventKey)
+	eventData := k.GetEvent(ctx, eventName, k.eKey)
+	k.SetEvent(ctx, eventName, eventData, k.cEKey)
+	k.DeleteEvent(ctx, eventName, k.eKey)
 }
 
 // SetNewOwner - Change Event Owner
 func (k Keeper) NewOwner(ctx sdk.Context, eventName string, previousOwnerAddress sdk.Address, newOwnerAddress sdk.AccAddress, newOwner string) {
-	eventData := k.GetEvent(ctx, eventName, k.eventKey)
+	eventData := k.GetEvent(ctx, eventName, k.eKey)
 	if eventData.EventOwnerAddress.Equals(previousOwnerAddress) {
 		eventData.EventOwner = newOwner
 		eventData.EventOwnerAddress = newOwnerAddress
-		k.SetEvent(ctx, eventName, eventData, k.eventKey)
+		k.SetEvent(ctx, eventName, eventData, k.eKey)
 	}
 }
 
@@ -90,5 +90,5 @@ func (k Keeper) CreateEvent(ctx sdk.Context, eventName string, totalTickets int,
 	eventData := ticType.CreateEvent(eventName, totalTickets, eventOwner,
 		eventOwnerAddress, resale, ticketData,
 		eventDetails)
-	k.SetEvent(ctx, eventName, eventData, k.eventKey)
+	k.SetEvent(ctx, eventName, eventData, k.eKey)
 }
