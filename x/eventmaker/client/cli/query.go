@@ -3,9 +3,9 @@ package cli
 import (
 	"fmt"
 
-	ticketTypes "github.com/marbar3778/tic_mark/types"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
+	ticketTypes "github.com/marbar3778/tic_mark/types"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +16,7 @@ func GetCmdGetEvent(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		Long:  "Get a specific event",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewClIContext().WithCodec(cdc)
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			event := args[0]
 
 			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/event/%s", queryRoute, event), nil)
@@ -24,9 +24,9 @@ func GetCmdGetEvent(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				fmt.Printf("could not resolve event name - %s \n", string(event))
 				return nil
 			}
-			var data ticketTypes.Event
-			cdc.MustUnmarshalJSON(res, &data)
-			return cliCtx.PrintOutPut(data)
+			var eventData ticketTypes.Event
+			cdc.MustUnmarshalJSON(res, &eventData)
+			return cliCtx.PrintOutput(eventData)
 		},
 	}
 }

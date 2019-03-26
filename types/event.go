@@ -56,6 +56,16 @@ func (e Event) ValidEventCreation() {
 	}
 }
 
+func (e Event) String() string {
+	return fmt.Sprintf(
+		`EventName: %s
+		EventOwner: %s
+		EventOwnerAddress: %s
+		TicketData: %v
+		EventDetail: %v`, e.EventName, e.EventOwner, e.EventOwnerAddress.String(),
+		e.TicketData, e.EventDetail)
+}
+
 // Eventdetails check
 func (e Event) EventDetails() string {
 	return fmt.Sprintf("Event name:%s, Total amount of tickets:%d, Event owner: %s", e.EventName, e.TicketData.TotalTickets, e.EventOwner)

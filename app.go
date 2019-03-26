@@ -23,7 +23,7 @@ const (
 	appName = "tic_mark"
 )
 
-type EventMarketApp struct {
+type eventMarketApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
@@ -42,12 +42,12 @@ type EventMarketApp struct {
 	tmKeeper            eventmaker.Keeper
 }
 
-func NewEventMarketApp(logger log.Logger, db dbm.DB) *EventMarketApp {
+func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 	cdc := MakeCodec()
 
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc))
 
-	var app = &EventMarketApp{
+	var app = &eventMarketApp{
 		BaseApp:          bApp,
 		cdc:              cdc,
 		keyMain:          sdk.NewKVStoreKey("main"),
@@ -128,7 +128,7 @@ type GenesisState struct {
 	Accounts []*auth.BaseAccount `json:"accounts"`
 }
 
-func (app *EventMarketApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *eventMarketApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	stateJSON := req.AppStateBytes
 
 	genesisState := new(GenesisState)
@@ -148,7 +148,7 @@ func (app *EventMarketApp) initChainer(ctx sdk.Context, req abci.RequestInitChai
 	return abci.ResponseInitChain{}
 }
 
-func (app *EventMarketApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
+func (app *eventMarketApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 	ctx := app.NewContext(true, abci.Header{})
 	accounts := []*auth.BaseAccount{}
 

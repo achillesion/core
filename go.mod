@@ -18,6 +18,7 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gogo/protobuf v1.2.1 // indirect
 	github.com/golang/protobuf v1.3.0 // indirect
+	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf // indirect
 	github.com/gorilla/mux v1.7.0
 	github.com/gorilla/websocket v1.4.0 // indirect
@@ -33,11 +34,12 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.3.0 // indirect
-	github.com/syndtr/goleveldb v1.0.0 // indirect
-	github.com/tendermint/btcd v0.1.1 // indirect
+	github.com/syndtr/goleveldb v0.0.0-20180708030551-c4c61651e9e3 // indirect
+	github.com/tendermint/btcd v0.1.1
 	github.com/tendermint/go-amino v0.14.1
-	github.com/tendermint/iavl v0.12.2 // indirect
-	github.com/tendermint/tendermint v0.30.2
+	github.com/tendermint/iavl v0.12.1
+	github.com/tendermint/lint v0.0.1 // indirect
+	github.com/tendermint/tendermint v0.31.0-dev0
 	github.com/zondax/hid v0.9.0 // indirect
 	github.com/zondax/ledger-go v0.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a // indirect
@@ -45,3 +47,5 @@ require (
 	google.golang.org/grpc v1.19.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
+
+replace golang.org/x/crypto => github.com/tendermint/crypto v0.0.0-20180820045704-3764759f34a5

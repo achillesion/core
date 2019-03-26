@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/marbar3778/tic_mark/types"
 	"github.com/marbar3778/tic_mark/x/eventmaker"
 
 	"github.com/gorilla/mux"
@@ -20,20 +21,21 @@ const (
 
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec, storeName string) {
 	r.HandleFunc(fmt.Sprintf("/%s/event", storeName), createEventHandler(cdc, cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/%s/event/newOwner", storeName), setNewOwnerHandler(cdc, cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/event/{%s}", storeName, restName), getEventHandler(cdc, cliCtx, storeName)).Methods("GET")
 }
 
 type createEventReq struct {
-	BaseReq           rest.BaseReq `json:"base_req"`
-	EventName         string       `json:"event_name"`
-	TotalTickets      int          `json:"total_tickets"`
-	TicketsSold       int          `json:"tickets_sold"` // this most likely will be zero but if they are splitting tickets across platforms
-	EventOwner        string       `json:"event_owner"`
-	EventOwnerAddress string       `json:"event_owner_address"`
-	Resale            bool         `json:"resale"`
+	BaseReq           rest.BaseReq       `json:"base_req"`
+	EventName         string             `json:"event_name"`
+	TotalTickets      int                `json:"ticket_owner"`
+	EventOwner        string             `json:"event_owner"`
+	EventOwnerAddress string             `json:"event_owner_address"`
+	Resale            bool               `json:"resale"`
+	TicketData        types.TicketData   `json:"ticket_data"`
+	EventDetails      types.EventDetails `json:"event_details"`
 }
 
-// NewMsgCreateEvent(eventName string, totalTickets int, ticketsSold int, eventOwner string, eventOwnerAddress sdk.AccAddress, resale bool)
 func createEventHandler(cdc *codec.Codec, cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req createEventReq
@@ -52,7 +54,7 @@ func createEventHandler(cdc *codec.Codec, cliCtx context.CLIContext) http.Handle
 			return
 		}
 
-		msg := eventmaker.NewMsgCreateEvent(req.EventName, req.TotalTickets, req.TicketsSold, req.EventOwner, addr)
+		msg := eventmaker.NewMsgCreateEvent(req.EventName, req.TotalTickets, req.EventOwner, addr, req.Resale, req.TicketData, req.EventDetails)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

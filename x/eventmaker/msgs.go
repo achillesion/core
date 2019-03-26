@@ -15,23 +15,21 @@ const RouterKey = "eventmaker"
 type MsgCreateEvent struct {
 	EventName         string             `json:"event_name"`
 	TotalTickets      int                `json:"ticket_owner"`
-	TicketsSold       int                `json:"tickets_sold"`
 	EventOwner        string             `json:"event_owner"`
 	EventOwnerAddress sdk.AccAddress     `json:"event_owner_address"`
 	Resale            bool               `json:"resale"`
 	TicketData        types.TicketData   `json:"ticket_data"`
-	EventDetails      types.EventDetails `json:"event_detials"`
+	EventDetails      types.EventDetails `json:"event_details"`
 }
 
 // NewMsgCreateEvent : create Event
 func NewMsgCreateEvent(
-	eventName string, totalTickets int, ticketsSold int,
+	eventName string, totalTickets int,
 	eventOwner string, eventOwnerAddress sdk.AccAddress, resale bool,
 	ticketData types.TicketData, eventDetails types.EventDetails) MsgCreateEvent {
 	return MsgCreateEvent{
 		EventName:         eventName,
 		TotalTickets:      totalTickets,
-		TicketsSold:       ticketsSold,
 		EventOwner:        eventOwner,
 		EventOwnerAddress: eventOwnerAddress,
 		Resale:            resale,
