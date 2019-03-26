@@ -31,10 +31,18 @@ emcli config indent true
 emcli config trust-node true
 ```
 
+## Lint
+
+To lint the files
+
+```
+make get-linter
+make lint
+```
+
 ## Things to do:
 
 - Makefile
-  - lint
   - build & install
 - market module coding
 - write tests
