@@ -15,15 +15,15 @@ type TicketData struct {
 }
 
 type EventDetails struct {
-	LocationName string `json:"location_name"`
-	Address      string `json:"address"` // Address of event
-	City         string `json:"city"`    // City in which the event is
-	Country      string `json:"country"` // Country the event is being held in
-	Date         string `json:"date"`    // date of the event, TODO: make it enable a multi day event
+	LocationName string    `json:"location_name"`
+	Address      string    `json:"address"` // Address of event
+	City         string    `json:"city"`    // City in which the event is
+	Country      string    `json:"country"` // Country the event is being held in
+	Date         Time.time `json:"date"`    // date of the event, TODO: make it enable a multi day event
 }
 
 type Event struct {
-	// unique identifier
+	EventId           UUID           `json:"event_id"`            // TODO: check what uuid is in golang
 	EventName         string         `json:"event_name"`          // Name of the Event
 	EventOwner        string         `json:"event_owner"`         // Event Organizer
 	EventOwnerAddress sdk.AccAddress `json:"event_owner_address"` // Event Organizer Address
@@ -84,4 +84,8 @@ func (e Event) GetEventDetails() EventDetails {
 func (e Event) SetDate(date string) EventDetails {
 	e.EventDetail.Date = date
 	return e.EventDetail
+}
+
+func (e Event) AddTicketIdentifier(ticketId string) {
+
 }

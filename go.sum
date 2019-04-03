@@ -257,6 +257,8 @@ github.com/tendermint/tendermint v0.30.2 h1:FpaNQABxRJedjayiX+X6G8mo6FWNnD2eWcKu
 github.com/tendermint/tendermint v0.30.2/go.mod h1:ymcPyWblXCplCPQjbOYbrF1fWnpslATMVqiGgWbZrlc=
 github.com/tendermint/tendermint v0.31.0-dev0 h1:SggTDR0UtPjqXaFmulEdUJ2X1y2fCXfTpc8utnJwb08=
 github.com/tendermint/tendermint v0.31.0-dev0/go.mod h1:ymcPyWblXCplCPQjbOYbrF1fWnpslATMVqiGgWbZrlc=
+github.com/tendermint/tendermint v0.31.1 h1:1O2kb95A3dAU2ijzz6Dpweo9jv+mWjKHsLGC+ujKTZw=
+github.com/tendermint/tendermint v0.31.1/go.mod h1:ymcPyWblXCplCPQjbOYbrF1fWnpslATMVqiGgWbZrlc=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 github.com/zondax/hid v0.9.0 h1:eiT3P6vNxAEVxXMw66eZUAAnU2zD33JBkfG/EnfAKl8=

@@ -6,11 +6,13 @@ This module is set to create the Events that are needed.
 
 ```golang
 type Event struct {
+  EventID           UUID
   EventName         string
   EventOwner        string
   EventOwnerAddress sdk.AccAddress
   TicketData        TicketData
   EventDetails      EventDetails
+  // TicketsID         []string // when selling a ticket then the UUId gets added here // TODO: see if we need this
 }
 ```
 
@@ -19,7 +21,7 @@ type EventDetails struct {
   Address      string
   City         string
   Country      string
-  Date         string // openingDate - closingDate
+  Date         Time.time
 }
 ```
 

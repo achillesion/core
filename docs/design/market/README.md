@@ -8,6 +8,7 @@ This module takes in data, to produce a non-fungible item. This item will have a
 
 ```golang
 type Item struct {
+  ItemID          UUID // unique identifier of the ticket
   OwnerName       string // owner of the item
   OwnerAddress    string // owner address
   ParentReference string || UUID // reference to parent in this case a event
@@ -20,7 +21,24 @@ type Item struct {
 }
 ```
 
-set key as event reference
+### Stores
+
+- Market store: ket = event, data is tickets tickets that are up for sale
+- Ticket store: key = event, data is tickets,
+
+## Open Questions:
+
+- Query tickets based on individuals, how?
+- Dex: If we want to build it out as a dex then we can put bids and asks for tickets?
+-
+
+#### Query all tickets a individual holds, Options:
+
+- 1. Have a auth module that has a store for each user that holds the tickets as data.
+  - the primary tasks of this module is to only add and delete tickets from the users store.
+  - key = sdk.AccAddress
+- 2. Create a extra store to handle user tickets
+  - key = user addess, data is the array of all tickets owned then. open and closed events
 
 ### Uses
 
