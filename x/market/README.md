@@ -21,6 +21,19 @@ type Item struct {
 }
 ```
 
+## Keeper
+
+```golang
+type Keeper struct {
+	CKeeper bank.Keeper
+	EKey    sdk.StoreKey // upcoming event key
+	TKey    sdk.StoreKey // key for tickets that are generated for the people
+	MKey    sdk.StoreKey // marketplace key for reselling
+	UKey    sdk.StoreKey // store to keep an array of all the user tickets
+	cdc     *codec.Codec
+}
+```
+
 ### Stores
 
 - Market store: ket = event, data is tickets tickets that are up for sale
@@ -38,7 +51,7 @@ type Item struct {
   - the primary tasks of this module is to only add and delete tickets from the users store.
   - key = sdk.AccAddress
 - 2. Create a extra store to handle user tickets
-  - key = user addess, data is the array of all tickets owned then. open and closed events
+  - key = user address, data is the array of all tickets owned then. open and closed events
 
 ### Uses
 
