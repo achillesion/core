@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"os/exec"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -15,15 +16,15 @@ type TicketData struct {
 }
 
 type EventDetails struct {
-	LocationName string    `json:"location_name"`
-	Address      string    `json:"address"` // Address of event
-	City         string    `json:"city"`    // City in which the event is
-	Country      string    `json:"country"` // Country the event is being held in
-	Date         Time.time `json:"date"`    // date of the event, TODO: make it enable a multi day event
+	LocationName string `json:"location_name"`
+	Address      string `json:"address"` // Address of event
+	City         string `json:"city"`    // City in which the event is
+	Country      string `json:"country"` // Country the event is being held in
+	Date         string `json:"date"`    // date of the event, TODO: make it enable a multi day event
 }
 
 type Event struct {
-	EventId           UUID           `json:"event_id"`            // TODO: check what uuid is in golang
+	EventId           string         `json:"event_id"`            // UUID for event
 	EventName         string         `json:"event_name"`          // Name of the Event
 	EventOwner        string         `json:"event_owner"`         // Event Organizer
 	EventOwnerAddress sdk.AccAddress `json:"event_owner_address"` // Event Organizer Address
@@ -39,8 +40,15 @@ func CreateEvent(eventName string, totalTickets int, eventOwner string,
 	if totalTickets <= 0 {
 		panic(fmt.Sprintf("amount of tickets can not be zero or less(-), you're amount is %v", totalTickets))
 	}
+	out, err := exec.Command("uuidgen").Output()
+	if err != nil {
+		panic(err)
+	}
+
+	uuid := fmt.Sprintf("%s", out)
 
 	return Event{
+		EventId:           uuid,
 		EventName:         eventName,
 		EventOwner:        eventOwner,
 		EventOwnerAddress: eventOwnerAddress,

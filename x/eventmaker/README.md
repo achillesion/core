@@ -62,3 +62,7 @@ type TicketData struct {
 - As an event owner I want to close my event, because it has passed and withdraw the money from the escrow
 - As an event owner I want to close my event because it was cancelled and refund all the ticket buyers
 - As a user I want a ticket from a specific event
+
+## TODO's
+
+- change event name to eventID
