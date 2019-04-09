@@ -24,7 +24,7 @@ type EventDetails struct {
 }
 
 type Event struct {
-	EventId           string         `json:"event_id"`            // UUID for event
+	EventID           string         `json:"event_id"`            // UUID for event
 	EventName         string         `json:"event_name"`          // Name of the Event
 	EventOwner        string         `json:"event_owner"`         // Event Organizer
 	EventOwnerAddress sdk.AccAddress `json:"event_owner_address"` // Event Organizer Address
@@ -48,7 +48,7 @@ func CreateEvent(eventName string, totalTickets int, eventOwner string,
 	uuid := fmt.Sprintf("%s", out)
 
 	return Event{
-		EventId:           uuid,
+		EventID:           uuid,
 		EventName:         eventName,
 		EventOwner:        eventOwner,
 		EventOwnerAddress: eventOwnerAddress,
@@ -92,8 +92,4 @@ func (e Event) GetEventDetails() EventDetails {
 func (e Event) SetDate(date string) EventDetails {
 	e.EventDetail.Date = date
 	return e.EventDetail
-}
-
-func (e Event) AddTicketIdentifier(ticketId string) {
-
 }

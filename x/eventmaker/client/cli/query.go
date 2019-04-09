@@ -21,7 +21,7 @@ func GetCmdGetEvent(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/event/%s", queryRoute, event), nil)
 			if err != nil {
-				fmt.Printf("could not resolve event name - %s \n", string(event))
+				fmt.Println("could not resolve event name - %s \n", string(event))
 				return nil
 			}
 			var eventData ticketTypes.Event

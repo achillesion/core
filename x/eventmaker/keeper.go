@@ -5,7 +5,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	emType "github.com/marbar3778/tic_mark/types"
+	emTypes "github.com/marbar3778/tic_mark/types"
 )
 
 // Keeper to house the events and tickets
@@ -29,18 +29,18 @@ func NewKeeper(coinKeeper bank.Keeper, eventKey sdk.StoreKey, closedEventKey sdk
 // GETTERS
 
 // GetEvent - Get specific Event
-func (k Keeper) GetEvent(ctx sdk.Context, eventID string, storekey sdk.StoreKey) emType.Event {
+func (k Keeper) GetEvent(ctx sdk.Context, eventID string, storekey sdk.StoreKey) emTypes.Event {
 	store := ctx.KVStore(storekey)
 	event := store.Get([]byte(eventID))
-	var Event emType.Event
+	var Event emTypes.Event
 	k.cdc.MustUnmarshalBinaryBare(event, &Event)
 	return Event
 }
 
-func (k Keeper) GetOpenEvent(ctx sdk.Context, eventID string) emType.Event {
+func (k Keeper) GetOpenEvent(ctx sdk.Context, eventID string) emTypes.Event {
 	store := ctx.KVStore(k.eKey)
 	event := store.Get([]byte(eventID))
-	var Event emType.Event
+	var Event emTypes.Event
 	k.cdc.MustUnmarshalBinaryBare(event, &Event)
 	return Event
 }
@@ -62,7 +62,7 @@ func (k Keeper) GetAllEvents(ctx sdk.Context, storeKey sdk.StoreKey) sdk.Iterato
 // SETTERS
 
 // SetEvent - Set event into store
-func (k Keeper) SetEvent(ctx sdk.Context, eventID string, eventData emType.Event,
+func (k Keeper) SetEvent(ctx sdk.Context, eventID string, eventData emTypes.Event,
 	storeKey sdk.StoreKey) {
 	store := ctx.KVStore(k.eKey)
 	store.Set([]byte(eventID), k.cdc.MustMarshalBinaryBare(eventData))
@@ -94,8 +94,8 @@ func (k Keeper) NewOwner(ctx sdk.Context, eventID string, previousOwnerAddress s
 // CreateEvent - Create event
 func (k Keeper) CreateEvent(ctx sdk.Context, eventName string, totalTickets int,
 	eventOwner string, eventOwnerAddress sdk.AccAddress, resale bool,
-	ticketData emType.TicketData, eventDetails emType.EventDetails) {
-	eventData := emType.CreateEvent(eventName, totalTickets, eventOwner,
+	ticketData emTypes.TicketData, eventDetails emTypes.EventDetails) {
+	eventData := emTypes.CreateEvent(eventName, totalTickets, eventOwner,
 		eventOwnerAddress, resale, ticketData,
 		eventDetails)
 	k.SetEvent(ctx, eventName, eventData, k.eKey)

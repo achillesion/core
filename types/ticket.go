@@ -19,7 +19,7 @@ type Ticket struct {
 	Price           sdk.Coin       // price that the item will be resold for
 }
 
-func NewTicket(ownerName string, ownerAddress sdk.AccAddress, parentReference string,
+func CreateTicket(ownerName string, ownerAddress sdk.AccAddress, parentReference string,
 	initialPrice sdk.Coin, ticketNumber int, totalTickets int,
 	markUpAllowed int, resale bool, price sdk.Coin) Ticket {
 	return Ticket{
