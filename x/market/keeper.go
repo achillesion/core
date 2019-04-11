@@ -36,6 +36,19 @@ func (k Keeper) GetTickets(ctx sdk.Context, eventID string) []emTypes.Ticket {
 	return Tickets
 }
 
+// Get Individual Ticket
+func (k Keeper) GetTicket(ctx sdk.Context, eventID string, ticketID string) emTypes.Ticket {
+	store := ctx.KVStore(k.eKey)
+	event := store.Get([]byte(eventID))
+	var Tickets []emTypes.Ticket
+	k.cdc.MustUnmarshalBinaryBare(event, &Tickets)
+	for _, t := range Tickets {
+		if t.TicketID == ticketID {
+			return t
+		}
+	}
+}
+
 // Get all tickets that a user may have
 func (k Keeper) GetUserTickets(ctx sdk.Context, userAddress sdk.AccAddress) []emTypes.Ticket {
 	store := ctx.KVStore(k.uKey)
@@ -45,16 +58,20 @@ func (k Keeper) GetUserTickets(ctx sdk.Context, userAddress sdk.AccAddress) []em
 	return Tickets
 }
 
-// Take the ticket data from the event and set it the ticket data
-// ownerName string, ownerAddress sdk.AccAddress, parentReference string,
-// 	initialPrice sdk.Coin, ticketNumber int, totalTickets int,
-// 	markUpAllowed int, resale bool, price sdk.Coin
+// initialPrice sdk.Coin, ticketNumber int, totalTickets int,
+// markUpAllowed int, resale bool, price sdk.Coin
 func (k Keeper) CreateTicket(ctx sdk.Context, parentReference string, ownerName string, ownerAddress sdk.AccAddress) emTypes.Ticket { // add ticket to UKey and EKey
 	event := em.GetOpenEvent(ctx, parentReference)
 	ticketData := event.TicketData
-	ticket := emTypes.CreateTicket(ownerName, ownerAddress, parentReference, ticketData.InitialPrice, ticketData.TicketNumber)
+	ticket := emTypes.CreateTicket(ownerName, ownerAddress, parentReference,
+		ticketData.InitialPrice, ticketData.TicketsSold ticketData.MarkUpAllowed,
+		ticketData.Resale, ticketData.InitialPrice)
+	ticketData.TicketNumber = ticketData.TicketNumber + 1
 	return ticket
 }
 
-// func (k Keeper) MoveTicketResale
+func (k Keeper) MoveTicketResale(ctx sdk.Context, ownerAddress sdk.AccAddress, ticketID string, eventID string) {
+
+}
+
 // func (k Keeper) SellTicket // changeOwner

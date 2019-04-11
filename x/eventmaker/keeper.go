@@ -37,6 +37,7 @@ func (k Keeper) GetEvent(ctx sdk.Context, eventID string, storekey sdk.StoreKey)
 	return Event
 }
 
+// Get only open events
 func (k Keeper) GetOpenEvent(ctx sdk.Context, eventID string) emTypes.Event {
 	store := ctx.KVStore(k.eKey)
 	event := store.Get([]byte(eventID))

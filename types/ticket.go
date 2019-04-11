@@ -2,11 +2,13 @@ package types
 
 import (
 	"fmt"
+	"os/exec"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type Ticket struct {
+	TicketID        string         // UUID for the ticket
 	OwnerName       string         // owner of the item
 	OwnerAddress    sdk.AccAddress // owner address
 	ParentReference string         // reference to parent in this case a event, UUID of the parent
@@ -22,7 +24,16 @@ type Ticket struct {
 func CreateTicket(ownerName string, ownerAddress sdk.AccAddress, parentReference string,
 	initialPrice sdk.Coin, ticketNumber int, totalTickets int,
 	markUpAllowed int, resale bool, price sdk.Coin) Ticket {
+
+	out, err := exec.Command("uuidgen").Output()
+	if err != nil {
+		panic(err)
+	}
+
+	uuid := fmt.Sprintf("%s", out)
+
 	return Ticket{
+		TicketID:        uuid,
 		OwnerName:       ownerName,
 		OwnerAddress:    ownerAddress,
 		ParentReference: parentReference,
