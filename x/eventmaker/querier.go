@@ -64,8 +64,8 @@ func queryUpcomingEventNames(ctx sdk.Context, req abci.RequestQuery, k Keeper) (
 	iterator := k.GetAllEvents(ctx, k.eKey)
 
 	for ; iterator.Valid(); iterator.Next() {
-		eventName := string(iterator.Key())
-		list = append(list, eventName)
+		eventID := string(iterator.Key())
+		list = append(list, eventID)
 	}
 
 	bz, err2 := codec.MarshalJSONIndent(k.cdc, list)

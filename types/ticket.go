@@ -75,11 +75,17 @@ func (t Ticket) GetCurrentOwner() string {
 	return fmt.Sprintf("Ticket Owner: %s, Ticket Owner Address: %s", t.OwnerName, t.OwnerAddress.String())
 }
 
-// Set new owner
+// Set new owner TODO: make changes be immutable, spawn a new ticket
 func (t Ticket) SetNewOwner(ownerName string, ownerAddress sdk.AccAddress) string {
 	t.OwnerName = ownerName
 	t.OwnerAddress = ownerAddress
 	return fmt.Sprintf("New Ticket Owner: %s, New Ticket Owner Address: %s", t.OwnerName, t.OwnerAddress)
+}
+
+func (t Ticket) ResaleTicket(ownerName string, ownerAddress sdk.AccAddress, resalePrice int) {
+	t.OwnerName = ownerName
+	t.OwnerAddress = ownerAddress
+	t.Price = t.InitialPrice // change me
 }
 
 // Get my ticket number

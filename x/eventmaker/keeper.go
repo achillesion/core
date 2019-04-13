@@ -58,8 +58,6 @@ func (k Keeper) GetAllEvents(ctx sdk.Context, storeKey sdk.StoreKey) sdk.Iterato
 	return sdk.KVStorePrefixIterator(store, nil)
 }
 
-// get all my events
-
 // SETTERS
 
 // SetEvent - Set event into store

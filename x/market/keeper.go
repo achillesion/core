@@ -11,7 +11,7 @@ import (
 //  Keeper for the market module
 type Keeper struct {
 	cKeeper bank.Keeper
-	eKey    sdk.StoreKey // upcoming event key
+	eKey    sdk.StoreKey // upcoming event key where the tickets will be held
 	mKey    sdk.StoreKey // marketplace key for reselling
 	uKey    sdk.StoreKey // store to keep an array of all the users that have tickets
 	cdc     *codec.Codec
@@ -27,13 +27,17 @@ func NewKeeper(cKeeper bank.Keeper, eKey sdk.StoreKey, mKey sdk.StoreKey, uKey s
 	}
 }
 
+// Getters
+
 // Get all tickets of an event
-func (k Keeper) GetTickets(ctx sdk.Context, eventID string) []emTypes.Ticket {
+func (k Keeper) GetTickets(ctx sdk.Context, eventID string) sdk.Iterator {
 	store := ctx.KVStore(k.eKey)
-	event := store.Get([]byte(eventID))
-	var Tickets []emTypes.Ticket
-	k.cdc.MustUnmarshalBinaryBare(event, &Tickets)
-	return Tickets
+	return sdk.KVStorePrefixIterator(store, nil)
+}
+
+func (k Keeper) GetMarketPlaceTickets(ctx sdk.Context, eventID string) sdk.Iterator {
+	store := ctx.KVStore(k.mKey)
+	return sdk.KVStorePrefixIterator(store, nil)
 }
 
 // Get Individual Ticket
@@ -46,6 +50,7 @@ func (k Keeper) GetTicket(ctx sdk.Context, eventID string, ticketID string) emTy
 		if t.TicketID == ticketID {
 			return t
 		}
+		panic("no ticket")
 	}
 }
 
@@ -58,20 +63,39 @@ func (k Keeper) GetUserTickets(ctx sdk.Context, userAddress sdk.AccAddress) []em
 	return Tickets
 }
 
-// initialPrice sdk.Coin, ticketNumber int, totalTickets int,
-// markUpAllowed int, resale bool, price sdk.Coin
-func (k Keeper) CreateTicket(ctx sdk.Context, parentReference string, ownerName string, ownerAddress sdk.AccAddress) emTypes.Ticket { // add ticket to UKey and EKey
-	event := em.GetOpenEvent(ctx, parentReference)
+// Setters
+
+// SetTicket into stores
+func (k Keeper) SetTicket(ctx sdk.Context, storeKey sdk.StoreKey, eventID string, ticketData emTypes.Ticket) {
+	store := ctx.KVStore(storeKey)
+	store.Set([]byte(eventID), k.cdc.MustMarshalBinaryBare(ticketData))
+}
+
+// Create Ticket based off the data from the event
+func (k Keeper) CreateTicket(ctx sdk.Context, eventID string, ownerName string, ownerAddress sdk.AccAddress) { // add ticket to UKey and EKey
+	event := em.GetOpenEvent(ctx, eventID)
 	ticketData := event.TicketData
-	ticket := emTypes.CreateTicket(ownerName, ownerAddress, parentReference,
-		ticketData.InitialPrice, ticketData.TicketsSold ticketData.MarkUpAllowed,
+	ticket := emTypes.CreateTicket(ownerName, ownerAddress, eventID,
+		ticketData.InitialPrice, ticketData.TicketsSold, ticketData.TotalTickets, ticketData.MarkUpAllowed,
 		ticketData.Resale, ticketData.InitialPrice)
 	ticketData.TicketNumber = ticketData.TicketNumber + 1
-	return ticket
+	k.SetTicket(ctx, k.eKey, eventID, ticket) // set ticket to event store
+	k.SetTicket(ctx, k.uKey, eventID, ticket) // set ticket to event store
 }
 
-func (k Keeper) MoveTicketResale(ctx sdk.Context, ownerAddress sdk.AccAddress, ticketID string, eventID string) {
-
+// Add the ticket to the market store
+func (k Keeper) ResaleTicket(ctx sdk.Context, ticketID string, eventID string) {
+	ticket := k.GetTicket(ctx, eventID, ticketID)
+	k.SetTicket(ctx, k.mKey, ticket)
 }
 
-// func (k Keeper) SellTicket // changeOwner
+func (k Keeper) SellTicket(ctx sdk.Context, ticketID string, eventID string,
+	newOwnerName string, newOwnerAddress sdk.AccAddress, sellingPrice int) {
+	ticket := k.GetTicket(ctx, ticketID, eventID)
+	ticket.ResaleTicket(newOwnerName, newOwnerAddress, sellingPrice)
+	k.SetTicket(ctx, k.eKey, eventID, ticket)
+	// uStore := ctx.KVStore(k.uKey)
+	// uStore.Delete make it delete a single entry of the key not the key
+	mStore := ctx.KVStore(k.mKey)
+	mStore.Delete([]byte(ticketID))
+} // changeOwner
