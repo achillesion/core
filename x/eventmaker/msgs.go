@@ -99,7 +99,7 @@ func (msg MsgNewOwner) ValidateBasic() sdk.Error {
 		return sdk.ErrUnknownRequest("There is no event name")
 	}
 	if msg.PreviousOwnerAddress.Empty() || msg.NewOwnerAddress.Empty() {
-		return sdk.ErrInvalidAddress("missing previos owner addres or new owner address")
+		return sdk.ErrInvalidAddress("Missing previous owner addres or new owner address")
 	}
 	if len(msg.NewOwner) == 0 {
 		return sdk.ErrUnknownRequest("Please provide a name for the new Owner")

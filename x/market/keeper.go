@@ -52,6 +52,7 @@ func (k Keeper) GetTicket(ctx sdk.Context, eventID string, ticketID string) emTy
 		}
 		panic("no ticket")
 	}
+	return emTypes.Ticket{}
 }
 
 // Get all tickets that a user may have
@@ -86,7 +87,7 @@ func (k Keeper) CreateTicket(ctx sdk.Context, eventID string, ownerName string, 
 // Add the ticket to the market store
 func (k Keeper) ResaleTicket(ctx sdk.Context, ticketID string, eventID string) {
 	ticket := k.GetTicket(ctx, eventID, ticketID)
-	k.SetTicket(ctx, k.mKey, ticket)
+	k.SetTicket(ctx, k.mKey, eventID, ticket)
 }
 
 func (k Keeper) SellTicket(ctx sdk.Context, ticketID string, eventID string,

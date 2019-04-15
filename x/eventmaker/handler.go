@@ -7,15 +7,15 @@ import (
 )
 
 // NewHandler : Handle messages to make changes to the store
-func NewHandler(keeper Keeper) sdk.Handler {
+func NewHandler(k Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
 		switch msg := msg.(type) {
 		case MsgCreateEvent:
-			return handleMsgCreateEvent(ctx, keeper, msg)
+			return handleMsgCreateEvent(ctx, k, msg)
 		case MsgNewOwner:
-			return handleMsgNewOwner(ctx, keeper, msg)
+			return handleMsgNewOwner(ctx, k, msg)
 		case MsgCloseEvent:
-			return handleMsgCloseEvent(ctx, keeper, msg)
+			return handleMsgCloseEvent(ctx, k, msg)
 		default:
 			errMsg := fmt.Sprintf("Unrecognized message: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
