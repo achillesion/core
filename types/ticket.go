@@ -92,3 +92,7 @@ func (t Ticket) ResaleTicket(ownerName string, ownerAddress sdk.AccAddress, resa
 func (t Ticket) GetTicketNumber() string {
 	return fmt.Sprintf("Ticket: %d/%d", t.TicketNumber, t.TotalTickets)
 }
+
+func (t Ticket) String() string {
+	return fmt.Sprintf("TicketID: %s", t.TicketID)
+}

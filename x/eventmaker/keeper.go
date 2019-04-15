@@ -99,3 +99,5 @@ func (k Keeper) CreateEvent(ctx sdk.Context, eventName string, totalTickets int,
 		eventDetails)
 	k.SetEvent(ctx, eventName, eventData, k.eKey)
 }
+
+// Mark ticket as checkedin

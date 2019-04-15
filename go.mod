@@ -4,6 +4,7 @@ go 1.12.3
 
 require (
 	github.com/VividCortex/gohistogram v1.0.0 // indirect
+	github.com/aristanetworks/goarista v0.0.0-20190409234242-46f4bc7b73ef // indirect
 	github.com/bartekn/go-bip39 v0.0.0-20171116152956-a05967ea095d // indirect
 	github.com/bgentry/speakeasy v0.1.0 // indirect
 	github.com/btcsuite/btcd v0.0.0-20190213025234-306aecffea32 // indirect

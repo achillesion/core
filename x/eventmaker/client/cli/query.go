@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// TODO:
+
 func GetCmdGetEvent(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get [event]",
