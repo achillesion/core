@@ -118,13 +118,13 @@ func (msg MsgNewOwner) GetSignBytes() []byte {
 
 // MsgCloseEvent : struct to close an event
 type MsgCloseEvent struct {
-	EventName         string         `json:"eventname"`
+	EventID           string         `json:"eventid"`
 	EventOwnerAddress sdk.AccAddress `json:"event_owner_address"`
 }
 
-func NewMsgCloseEvent(eventName string, eventOwnerAddress sdk.AccAddress) MsgCloseEvent {
+func NewMsgCloseEvent(eventID string, eventOwnerAddress sdk.AccAddress) MsgCloseEvent {
 	return MsgCloseEvent{
-		EventName:         eventName,
+		EventID:           eventID,
 		EventOwnerAddress: eventOwnerAddress,
 	}
 }
@@ -138,8 +138,8 @@ func (msg MsgCloseEvent) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic : validity check
 func (msg MsgCloseEvent) ValidateBasic() sdk.Error {
-	if len(msg.EventName) == 0 {
-		return sdk.ErrUnknownRequest(fmt.Sprintf("Please Provide a valid event name: %s", msg.EventName))
+	if len(msg.EventID) == 0 {
+		return sdk.ErrUnknownRequest(fmt.Sprintf("Please Provide a valid event name: %s", msg.EventID))
 	}
 	if msg.EventOwnerAddress.Empty() {
 		return sdk.ErrInvalidAddress("missing event owner address")

@@ -28,27 +28,36 @@ func NewKeeper(coinKeeper bank.Keeper, eventKey sdk.StoreKey, closedEventKey sdk
 
 // GETTERS
 
-// GetEvent - Get specific Event
-func (k Keeper) GetEvent(ctx sdk.Context, eventID string, storekey sdk.StoreKey) emTypes.Event {
-	store := ctx.KVStore(storekey)
-	event := store.Get([]byte(eventID))
+// GetClosedEvent - Get specific Event
+func (k Keeper) GetClosedEvent(ctx sdk.Context, eventID string) (event emTypes.Event, ok bool) {
+	store := ctx.KVStore(k.ceKey)
+	eventData := store.Get([]byte(eventID))
+	if eventData == nil {
+		return nil, false
+	}
 	var Event emTypes.Event
-	k.cdc.MustUnmarshalBinaryBare(event, &Event)
-	return Event
+	k.cdc.MustUnmarshalBinaryLengthPrefixed(eventData, &Event)
+	return Event, true
 }
 
 // Get only open events
-func (k Keeper) GetOpenEvent(ctx sdk.Context, eventID string) emTypes.Event {
+func (k Keeper) GetOpenEvent(ctx sdk.Context, eventID string) (event emTypes.Event, ok bool) {
 	store := ctx.KVStore(k.eKey)
-	event := store.Get([]byte(eventID))
+	eventData := store.Get([]byte(eventID))
+	if eventData == nil {
+		return nil, false
+	}
 	var Event emTypes.Event
-	k.cdc.MustUnmarshalBinaryBare(event, &Event)
-	return Event
+	k.cdc.MustUnmarshalBinaryBare(eventData, &Event)
+	return Event, true
 }
 
 // GetEventOwner - Get the owner of the event
 func (k Keeper) GetEventOwner(ctx sdk.Context, eventID string) sdk.AccAddress {
-	eventData := k.GetEvent(ctx, eventID, k.eKey)
+	eventData, ok := k.GetOpenEvent(ctx, eventID)
+	if !ok {
+		panic("Event is not found")
+	}
 	return eventData.EventOwnerAddress
 }
 
@@ -75,14 +84,20 @@ func (k Keeper) DeleteEvent(ctx sdk.Context, eventID string, storeKey sdk.StoreK
 
 // CloseEvent - Take event from actice events and place in inactive event store
 func (k Keeper) CloseEvent(ctx sdk.Context, eventID string) {
-	eventData := k.GetEvent(ctx, eventID, k.eKey)
+	eventData, ok := k.GetOpenEvent(ctx, eventID)
+	if !ok {
+		panic("No event to close")
+	}
 	k.SetEvent(ctx, eventID, eventData, k.ceKey)
 	k.DeleteEvent(ctx, eventID, k.eKey)
 }
 
 // SetNewOwner - Change Event Owner
 func (k Keeper) NewOwner(ctx sdk.Context, eventID string, previousOwnerAddress sdk.Address, newOwnerAddress sdk.AccAddress, newOwner string) {
-	eventData := k.GetEvent(ctx, eventID, k.eKey)
+	eventData, ok := k.GetOpenEvent(ctx, eventID)
+	if !ok {
+		panic("Event does not exist")
+	}
 	if eventData.EventOwnerAddress.Equals(previousOwnerAddress) {
 		eventData.EventOwner = newOwner
 		eventData.EventOwnerAddress = newOwnerAddress

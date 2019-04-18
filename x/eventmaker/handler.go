@@ -39,9 +39,9 @@ func handleMsgNewOwner(ctx sdk.Context, k Keeper, msg MsgNewOwner) sdk.Result {
 }
 
 func handleMsgCloseEvent(ctx sdk.Context, k Keeper, msg MsgCloseEvent) sdk.Result {
-	if !msg.EventOwnerAddress.Equals(k.GetEventOwner(ctx, msg.EventName)) {
+	if !msg.EventOwnerAddress.Equals(k.GetEventOwner(ctx, msg.EventID)) {
 		return sdk.ErrUnauthorized(fmt.Sprintf("Unauthorized address: %s", msg.EventOwnerAddress)).Result()
 	}
-	k.CloseEvent(ctx, msg.EventName)
+	k.CloseEvent(ctx, msg.EventID)
 	return sdk.Result{}
 }

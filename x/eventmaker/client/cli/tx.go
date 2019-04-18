@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
 	eventTypes "github.com/marbar3778/tic_mark/types"
-	"github.com/marbar3778/tic_mark/x/eventmaker"
+	em "github.com/marbar3778/tic_mark/x/eventmaker"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
@@ -57,10 +57,10 @@ func GetCmdCreateEvent(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			ticketData := eventTypes.TicketData{}
+			ticketData := eventTypes.TicketData{} // TODO: change me to correct data
 			eventData := eventTypes.EventDetails{}
 
-			msg := eventmaker.NewMsgCreateEvent(args[0], num, args[3], cliCtx.GetFromAddress(), boo, ticketData, eventData)
+			msg := em.NewMsgCreateEvent(args[0], num, args[3], cliCtx.GetFromAddress(), boo, ticketData, eventData)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -68,7 +68,7 @@ func GetCmdCreateEvent(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx.PrintResponse = true
 
-			return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, []sdk.Msg{msg})
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
 		},
 	}
 }
@@ -94,7 +94,7 @@ func GetCmdNewOwner(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := eventmaker.NewMsgNewOwner(args[0], cliCtx.GetFromAddress(), addr, args[2])
+			msg := em.NewMsgNewOwner(args[0], cliCtx.GetFromAddress(), addr, args[2])
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -102,7 +102,32 @@ func GetCmdNewOwner(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx.PrintResponse = true
 
-			return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, []sdk.Msg{msg})
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+		},
+	}
+}
+
+func GetCmdCloseEvent(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "closeEvent [eventID] [eventOwnerAddress]",
+		Short: "Close an event",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
+			eventID := args[0]
+
+			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			if err := cliCtx.EnsureAccountExists(); err != nil {
+				return err
+			}
+			msg := em.NewMsgCloseEvent(eventID, sdk.AccAddress(args[1]))
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+			cliCtx.PrintResponse = true
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
 		},
 	}
 }
