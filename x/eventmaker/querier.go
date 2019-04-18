@@ -10,8 +10,8 @@ import (
 
 // query endpoints
 const (
-	QueryUpcomingEvent      = "upcoming_event"
-	QueryClosedEvent        = "closed_event"
+	QueryUpcomingEvent      = "openevent"
+	QueryClosedEvent        = "closedevent"
 	QueryUpcomingEventNames = "upcoming_event_names"
 	QueryClosedEventNames   = "closed_event_names"
 	QueryOwner              = "query_owner"

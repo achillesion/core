@@ -2,7 +2,7 @@ package client
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
-	eventmakercmd "github.com/marbar3778/tic_mark/x/eventmaker/client/cli"
+	emd "github.com/marbar3778/tic_mark/x/eventmaker/client/cli"
 	"github.com/spf13/cobra"
 	amino "github.com/tendermint/go-amino"
 )
@@ -22,7 +22,9 @@ func (mc ModuleClient) GetQueryCmd() *cobra.Command {
 		Short: "Querying commands for the eventmaker module",
 	}
 	ticketQueryCmd.AddCommand(client.GetCommands(
-		eventmakercmd.GetCmdGetEvent(mc.storekey, mc.cdc),
+		emd.GetCmdGetOpenEvent(mc.storekey, mc.cdc),
+		emd.GetCmdGetClosedEvent(mc.storekey, mc.cdc),
+		emd.GetCmdGetOwner(mc.storekey, mc.cdc)
 	)...)
 
 	return ticketQueryCmd
@@ -36,8 +38,9 @@ func (mc ModuleClient) GetTxCmd() *cobra.Command {
 	}
 
 	ticketTxCmd.AddCommand(client.PostCommands(
-		eventmakercmd.GetCmdCreateEvent(mc.cdc),
-		eventmakercmd.GetCmdNewOwner(mc.cdc),
+		emd.GetCmdCreateEvent(mc.cdc),
+		emd.GetCmdNewOwner(mc.cdc),
+		emd.GetCmdCloseEvent(mc.cdc)
 	)...)
 
 	return ticketTxCmd
