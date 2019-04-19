@@ -118,7 +118,7 @@ func (msg MsgNewOwner) GetSignBytes() []byte {
 
 // MsgCloseEvent : struct to close an event
 type MsgCloseEvent struct {
-	EventID           string         `json:"eventid"`
+	EventID           string         `json:"event_id"`
 	EventOwnerAddress sdk.AccAddress `json:"event_owner_address"`
 }
 
