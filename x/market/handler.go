@@ -11,8 +11,10 @@ func NewHandler(k Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case MsgCreateTicket:
 			return handleMsgCreateTicket(ctx, k, msg)
-		case MsgResaleTicket:
-			return handleMsgResaleTicket(ctx, k, msg)
+		case MsgAddTicketToMarket:
+			return handleMsgAddTicketToMarket(ctx, k, msg)
+		// case MsgSellTicket:
+		// return handleMsgSellTicket(ctx, k, msg)
 		default:
 			errMsg := fmt.Sprintf("Unrecognized message: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -25,7 +27,7 @@ func handleMsgCreateTicket(ctx sdk.Context, k Keeper, msg MsgCreateTicket) sdk.R
 	return sdk.Result{}
 }
 
-func handleMsgResaleTicket(ctx sdk.Context, k Keeper, msg MsgResaleTicket) sdk.Result {
+func handleMsgAddTicketToMarket(ctx sdk.Context, k Keeper, msg MsgAddTicketToMarket) sdk.Result {
 	k.ResaleTicket(ctx, msg.TicketID, msg.EventID)
 	return sdk.Result{}
 }

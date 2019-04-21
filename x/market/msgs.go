@@ -51,14 +51,14 @@ func (msg MsgCreateTicket) GetSignBytes() []byte {
 	return sdk.MustSortJSON(b)
 }
 
-type MsgResaleTicket struct {
+type MsgAddTicketToMarket struct {
 	EventID     string         `json:"event_id"`
 	TicketID    string         `json:"ticket_id"`
 	TicketOwner sdk.AccAddress `json:"ticket_owner"`
 }
 
-func NewMsgResaleTicket(eventID string, ticketID string, ticketOwner sdk.AccAddress) MsgResaleTicket {
-	return MsgResaleTicket{
+func NewMsgAddTicketToMarket(eventID string, ticketID string, ticketOwner sdk.AccAddress) MsgAddTicketToMarket {
+	return MsgAddTicketToMarket{
 		EventID:     eventID,
 		TicketID:    ticketID,
 		TicketOwner: ticketOwner,
@@ -66,13 +66,13 @@ func NewMsgResaleTicket(eventID string, ticketID string, ticketOwner sdk.AccAddr
 }
 
 //nolint
-func (msg MsgResaleTicket) Route() string { return RouterKey }
-func (msg MsgResaleTicket) Type() string  { return "resale_ticket" }
-func (msg MsgResaleTicket) GetSigners() []sdk.AccAddress {
+func (msg MsgAddTicketToMarket) Route() string { return RouterKey }
+func (msg MsgAddTicketToMarket) Type() string  { return "resale_ticket" }
+func (msg MsgAddTicketToMarket) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.TicketOwner}
 }
 
-func (msg MsgResaleTicket) ValidateBasic() sdk.Error {
+func (msg MsgAddTicketToMarket) ValidateBasic() sdk.Error {
 	if len(msg.EventID) == 0 || len(msg.TicketID) == 0 {
 		return sdk.ErrUnknownRequest(fmt.Sprintf("There is no eventID and/or ticketID, eventID: %s, ticketID: %s", msg.EventID, msg.TicketID))
 	}
@@ -82,7 +82,7 @@ func (msg MsgResaleTicket) ValidateBasic() sdk.Error {
 	return nil
 }
 
-func (msg MsgResaleTicket) GetSignBytes() []byte {
+func (msg MsgAddTicketToMarket) GetSignBytes() []byte {
 	b, err := json.Marshal(msg)
 	if err != nil {
 		panic(err)

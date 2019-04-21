@@ -31,6 +31,6 @@ func (mc ModuleClient) GetQueryCmd() *cobra.Command {
 	ticketQueryCmd.AddCommand(client.PostCommands(
 		market.GetCmdCreateTicket(mc.cdc),
 		market.GetCmdResellTicket(mc.cdc),
-	))
+	)...)
 	return ticketQueryCmd
 }

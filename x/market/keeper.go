@@ -90,13 +90,13 @@ func (k Keeper) ResaleTicket(ctx sdk.Context, ticketID string, eventID string) {
 	k.SetTicket(ctx, k.mKey, eventID, ticket)
 }
 
-func (k Keeper) SellTicket(ctx sdk.Context, ticketID string, eventID string,
+func (k Keeper) AddTicketToMarket(ctx sdk.Context, ticketID string, eventID string,
 	newOwnerName string, newOwnerAddress sdk.AccAddress, sellingPrice int) {
 	ticket := k.GetTicket(ctx, ticketID, eventID)
-	ticket.ResaleTicket(newOwnerName, newOwnerAddress, sellingPrice)
-	k.SetTicket(ctx, k.eKey, eventID, ticket)
-	// uStore := ctx.KVStore(k.uKey)
-	// uStore.Delete make it delete a single entry of the key not the key
-	mStore := ctx.KVStore(k.mKey)
-	mStore.Delete([]byte(ticketID))
-} // changeOwner
+	k.SetTicket(ctx, k.mKey, eventID, ticket)
+}
+
+// uStore := ctx.KVStore(k.uKey)
+// uStore.Delete make it delete a single entry of the key not the key
+// mStore := ctx.KVStore(k.mKey)
+// mStore.Delete([]byte(ticketID))

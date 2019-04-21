@@ -2,14 +2,12 @@ package cli
 
 import (
 	"github.com/spf13/cobra"
-	"net/http"
 	"github.com/cosmos/cosmos-sdk/client/utils"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/marbar3778/tic_mark/x/market"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
 )
 
 type Ticket struct {
@@ -46,10 +44,10 @@ func GetCmdCreateTicket(cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetCmdResellTicket(cdc *codec.Codec) *cobra.Command {
+func GetCmdAddTicketToMarket(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use: "ressellticket [eventID] [ticketID]",
-		Short: "Try to resell your ticket",
+		Use: "addtickettomarket [eventID] [ticketID]",
+		Short: "Add your ticket to the marketplace to be sold",
 		Args: cobra.ExactArgs(2),
 		RunE: func (cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -65,7 +63,7 @@ func GetCmdResellTicket(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			cliCtx.PrintResponse = true
-			
+
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
 		}
 	}
