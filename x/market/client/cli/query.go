@@ -29,7 +29,7 @@ func GetCmdGetTickets(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-func GetTicket(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdGetTicket(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "Get ticket [ticketID]",
 		Short: "Get specific ticket",
