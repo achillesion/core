@@ -55,6 +55,7 @@ type MsgAddTicketToMarket struct {
 	EventID     string         `json:"event_id"`
 	TicketID    string         `json:"ticket_id"`
 	TicketOwner sdk.AccAddress `json:"ticket_owner"`
+	SalePrice   int            `json:"sale_price"`
 }
 
 func NewMsgAddTicketToMarket(eventID string, ticketID string, ticketOwner sdk.AccAddress) MsgAddTicketToMarket {

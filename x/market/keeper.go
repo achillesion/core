@@ -90,11 +90,17 @@ func (k Keeper) ResaleTicket(ctx sdk.Context, ticketID string, eventID string) {
 	k.SetTicket(ctx, k.mKey, eventID, ticket)
 }
 
-func (k Keeper) AddTicketToMarket(ctx sdk.Context, ticketID string, eventID string,
-	newOwnerName string, newOwnerAddress sdk.AccAddress, sellingPrice int) {
+func (k Keeper) AddTicketToMarket(ctx sdk.Context, ticketID string, eventID string, sellingPrice int) {
 	ticket := k.GetTicket(ctx, ticketID, eventID)
+
+		// ticket.SetNewPrice(ticket.)
+		// need to check if first time in sale to use orignial price
+		// if not then get maxmarkupallowed and proposed price to see if its within purposed price
+		// put inital price
 	k.SetTicket(ctx, k.mKey, eventID, ticket)
 }
+
+func (k Keeper ) SellTicket
 
 // uStore := ctx.KVStore(k.uKey)
 // uStore.Delete make it delete a single entry of the key not the key

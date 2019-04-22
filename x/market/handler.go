@@ -28,6 +28,6 @@ func handleMsgCreateTicket(ctx sdk.Context, k Keeper, msg MsgCreateTicket) sdk.R
 }
 
 func handleMsgAddTicketToMarket(ctx sdk.Context, k Keeper, msg MsgAddTicketToMarket) sdk.Result {
-	k.ResaleTicket(ctx, msg.TicketID, msg.EventID)
+	k.AddTicketToMarket(ctx, msg.TicketID, msg.EventID, 5)
 	return sdk.Result{}
 }
