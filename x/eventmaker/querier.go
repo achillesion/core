@@ -18,7 +18,7 @@ const (
 )
 
 // NewQuerier : Query handler
-func NewQuerier(keeper Keeper) sdk.Querier {
+func NewQuerier(keeper BaseKeeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
 		switch path[0] {
 		case QueryUpcomingEvent:
@@ -37,7 +37,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 	}
 }
 
-func queryUpcomingEvent(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) (res []byte, err sdk.Error) {
+func queryUpcomingEvent(ctx sdk.Context, path []string, req abci.RequestQuery, k BaseKeeper) (res []byte, err sdk.Error) {
 	event := path[0]
 
 	value, ok := k.GetOpenEvent(ctx, event)
@@ -53,7 +53,7 @@ func queryUpcomingEvent(ctx sdk.Context, path []string, req abci.RequestQuery, k
 	return bz, nil
 }
 
-func queryClosedEvent(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) (res []byte, err sdk.Error) {
+func queryClosedEvent(ctx sdk.Context, path []string, req abci.RequestQuery, k BaseKeeper) (res []byte, err sdk.Error) {
 	event := path[0]
 
 	value, ok := k.GetClosedEvent(ctx, event)
@@ -69,7 +69,7 @@ func queryClosedEvent(ctx sdk.Context, path []string, req abci.RequestQuery, k K
 	return bz, nil
 }
 
-func queryUpcomingEventNames(ctx sdk.Context, req abci.RequestQuery, k Keeper) (res []byte, err sdk.Error) {
+func queryUpcomingEventNames(ctx sdk.Context, req abci.RequestQuery, k BaseKeeper) (res []byte, err sdk.Error) {
 	var list []string
 
 	iterator := k.GetAllEvents(ctx, k.eKey)
@@ -87,7 +87,7 @@ func queryUpcomingEventNames(ctx sdk.Context, req abci.RequestQuery, k Keeper) (
 	return bz, nil
 }
 
-func queryClosedEventNames(ctx sdk.Context, req abci.RequestQuery, k Keeper) (res []byte, err sdk.Error) {
+func queryClosedEventNames(ctx sdk.Context, req abci.RequestQuery, k BaseKeeper) (res []byte, err sdk.Error) {
 	var list []string
 
 	iterator := k.GetAllEvents(ctx, k.ceKey)
@@ -113,7 +113,7 @@ func (q QueryResOwner) String() string {
 	return fmt.Sprintf("Event Owner Address: %s", q.Owner)
 }
 
-func queryOwner(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) (res []byte, err sdk.Error) {
+func queryOwner(ctx sdk.Context, path []string, req abci.RequestQuery, k BaseKeeper) (res []byte, err sdk.Error) {
 	eventID := path[0]
 
 	owner := k.GetEventOwner(ctx, eventID)

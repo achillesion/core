@@ -5,11 +5,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	emTypes "github.com/marbar3778/tic_mark/types"
-	em "github.com/marbar3778/tic_mark/x/eventmaker"
+	em "github.com/marbar3778/tic_mark/x/eventmaker" // add expected_types so you aren't importing 
 )
 
 //  Keeper for the market module
-type Keeper struct {
+type Keeper struct { 
+	// TODO: add in em keeper in newKeeper instead of import
 	cKeeper bank.Keeper
 	eKey    sdk.StoreKey // upcoming event key where the tickets will be held
 	mKey    sdk.StoreKey // marketplace key for reselling
@@ -19,6 +20,7 @@ type Keeper struct {
 
 func NewKeeper(cKeeper bank.Keeper, eKey sdk.StoreKey, mKey sdk.StoreKey, uKey sdk.StoreKey, cdc *codec.Codec) Keeper {
 	return Keeper{
+		// TODO: add in em keeper in newKeeper instead of import
 		cKeeper: cKeeper,
 		eKey:    eKey,
 		mKey:    mKey,

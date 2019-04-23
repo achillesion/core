@@ -21,7 +21,7 @@ func GetCmdGetOpenEvent(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/openevent/%s", queryRoute, event), nil)
 			if err != nil {
-				fmt.Println("could not resolve event name - %s \n", string(event))
+				fmt.Printf("could not resolve event name - %s \n", event)
 				return nil
 			}
 			var eventData ticketTypes.Event
@@ -42,7 +42,7 @@ func GetCmdGetClosedEvent(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/closedevent/%s", queryRoute, event), nil)
 			if err != nil {
-				fmt.Println("could not resolve event name - %s \n", string(event))
+				fmt.Printf("could not resolve event name - %s \n", event)
 				return nil
 			}
 			var eventData ticketTypes.Event
@@ -63,7 +63,7 @@ func GetCmdGetOwner(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 			res, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/owner/%s", queryRoute, event), nil)
 			if err != nil {
-				fmt.Println("could not resolve event name - %s \n", string(event))
+				fmt.Printf("could not resolve event name - %s \n", event)
 				return nil
 			}
 			var owner em.QueryResOwner
