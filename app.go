@@ -39,7 +39,7 @@ type eventMarketApp struct {
 	bankKeeper          bank.Keeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	paramsKeeper        params.Keeper
-	tmKeeper            eventmaker.Keeper
+	emKeeper            eventmaker.BaseKeeper
 }
 
 func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
@@ -76,7 +76,7 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(cdc, app.keyFeeCollection)
 
-	app.tmKeeper = eventmaker.NewKeeper(
+	app.emKeeper = eventmaker.NewKeeper(
 		app.bankKeeper,
 		app.keyEM,
 		app.keyECM,
@@ -87,10 +87,10 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 
 	app.Router().
 		AddRoute("bank", bank.NewHandler(app.bankKeeper)).
-		AddRoute("eventmaker", eventmaker.NewHandler(app.tmKeeper))
+		AddRoute("eventmaker", eventmaker.NewHandler(app.emKeeper))
 
 	app.QueryRouter().
-		AddRoute("eventmaker", eventmaker.NewQuerier(app.tmKeeper))
+		AddRoute("eventmaker", eventmaker.NewQuerier(app.emKeeper))
 
 	app.SetInitChainer(app.initChainer)
 

@@ -18,5 +18,5 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, cdc *codec.Codec, 
 	r.HandleFunc(fmt.Sprintf("/%s/event/newOwner", storeName), setNewOwnerHandler(cdc, cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/event/close/%s", storeName, restName), closeEvent(cdc, cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/event/open/{%s}", storeName, restName), getOpenEventHandler(cdc, cliCtx, storeName)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/%s/event/closed/{%s}", storeName, restName), getClosedEventHandler(cdc, cliCtx, storeName).Methods("GET"))
+	r.HandleFunc(fmt.Sprintf("/%s/event/closed/{%s}", storeName, restName), getClosedEventHandler(cdc, cliCtx, storeName)).Methods("GET")
 }

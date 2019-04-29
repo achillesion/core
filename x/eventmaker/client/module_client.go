@@ -24,7 +24,7 @@ func (mc ModuleClient) GetQueryCmd() *cobra.Command {
 	ticketQueryCmd.AddCommand(client.GetCommands(
 		emd.GetCmdGetOpenEvent(mc.storekey, mc.cdc),
 		emd.GetCmdGetClosedEvent(mc.storekey, mc.cdc),
-		emd.GetCmdGetOwner(mc.storekey, mc.cdc)
+		emd.GetCmdGetOwner(mc.storekey, mc.cdc),
 	)...)
 
 	return ticketQueryCmd
@@ -40,7 +40,7 @@ func (mc ModuleClient) GetTxCmd() *cobra.Command {
 	ticketTxCmd.AddCommand(client.PostCommands(
 		emd.GetCmdCreateEvent(mc.cdc),
 		emd.GetCmdNewOwner(mc.cdc),
-		emd.GetCmdCloseEvent(mc.cdc)
+		emd.GetCmdCloseEvent(mc.cdc),
 	)...)
 
 	return ticketTxCmd
