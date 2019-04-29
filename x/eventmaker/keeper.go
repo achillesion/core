@@ -2,7 +2,6 @@ package eventmaker
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/x/bank"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	emTypes "github.com/marbar3778/tic_mark/types"
@@ -14,19 +13,17 @@ type Keeper interface {
 
 // Keeper to house the events and tickets
 type BaseKeeper struct {
-	coinKeeper bank.Keeper
-	eKey       sdk.StoreKey // store for upcoming and ongoing events
-	ceKey      sdk.StoreKey // store for events that have passed
-	cdc        *codec.Codec
+	eKey  sdk.StoreKey // store for upcoming and ongoing events
+	ceKey sdk.StoreKey // store for events that have passed
+	cdc   *codec.Codec
 }
 
 // NewKeeper : Generate a new keeper when called
-func NewKeeper(coinKeeper bank.Keeper, eventKey sdk.StoreKey, closedEventKey sdk.StoreKey, cdc *codec.Codec) BaseKeeper {
+func NewKeeper(eventKey sdk.StoreKey, closedEventKey sdk.StoreKey, cdc *codec.Codec) BaseKeeper {
 	return BaseKeeper{
-		coinKeeper: coinKeeper,
-		eKey:       eventKey,
-		ceKey:      closedEventKey,
-		cdc:        cdc,
+		eKey:  eventKey,
+		ceKey: closedEventKey,
+		cdc:   cdc,
 	}
 }
 

@@ -77,7 +77,6 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(cdc, app.keyFeeCollection)
 
 	app.emKeeper = eventmaker.NewKeeper(
-		app.bankKeeper,
 		app.keyEM,
 		app.keyECM,
 		app.cdc,
@@ -101,7 +100,7 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 		app.keyECM,
 		app.keyFeeCollection,
 		app.keyParams,
-		app.keyParams,
+		app.tkeyParams,
 	)
 
 	err := app.LoadLatestVersion(app.keyMain)
