@@ -44,7 +44,7 @@ type eventMarketApp struct {
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	paramsKeeper        params.Keeper
 	emKeeper            eventmaker.BaseKeeper
-	marketKeeper        market.keeper
+	marketKeeper        market.Keeper
 }
 
 func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {

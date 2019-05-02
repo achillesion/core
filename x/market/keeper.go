@@ -76,7 +76,7 @@ func (k Keeper) SetTicket(ctx sdk.Context, storeKey sdk.StoreKey, eventID string
 
 // Create Ticket based off the data from the event
 func (k Keeper) CreateTicket(ctx sdk.Context, eventID string, ownerName string, ownerAddress sdk.AccAddress) { // add ticket to UKey and EKey
-	event, ok := em.BaseKeeper.GetOpenEvent(ctx, eventID)
+	event, ok := k.EventKeeper.GetOpenEvent(ctx, eventID)
 	if !ok {
 		panic("error")
 	}
