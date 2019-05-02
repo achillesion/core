@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/marbar3778/tic_mark/x/eventmaker"
+	"github.com/marbar3778/tic_mark/x/market"
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -27,10 +28,13 @@ type eventMarketApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
-	keyMain          *sdk.KVStoreKey
-	keyAccount       *sdk.KVStoreKey
-	keyEM            *sdk.KVStoreKey // key for upcoming event store
-	keyECM           *sdk.KVStoreKey // key for closed event store
+	keyMain    *sdk.KVStoreKey
+	keyAccount *sdk.KVStoreKey
+	keyEM      *sdk.KVStoreKey // key for upcoming event store
+	keyECM     *sdk.KVStoreKey // key for closed event store
+	keyMA      *sdk.KVStoreKey // marketplace store
+	keyU       *sdk.KVStoreKey // user ticket store
+
 	keyFeeCollection *sdk.KVStoreKey
 	keyParams        *sdk.KVStoreKey
 	tkeyParams       *sdk.TransientStoreKey
@@ -40,6 +44,7 @@ type eventMarketApp struct {
 	feeCollectionKeeper auth.FeeCollectionKeeper
 	paramsKeeper        params.Keeper
 	emKeeper            eventmaker.BaseKeeper
+	marketKeeper        market.keeper
 }
 
 func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
@@ -54,6 +59,8 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 		keyAccount:       sdk.NewKVStoreKey("acc"),
 		keyEM:            sdk.NewKVStoreKey("em"),
 		keyECM:           sdk.NewKVStoreKey("closed_events"),
+		keyMA:            sdk.NewKVStoreKey("market"),
+		keyU:             sdk.NewKVStoreKey("user_account"),
 		keyFeeCollection: sdk.NewKVStoreKey("fee_collection"),
 		keyParams:        sdk.NewKVStoreKey("params"),
 		tkeyParams:       sdk.NewTransientStoreKey("transient_params"),
@@ -82,6 +89,15 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 		app.cdc,
 	)
 
+	// app.marketKeeper = market.NewKeeper( // TODO: add access to eventmaker module
+	// 	app.bankKeeper,
+	// 	app.keyEM,
+	// 	app.keyMA,
+	// 	app.keyU,
+	// 	app.cdc,
+	//	app.emKeeper,
+	// )
+
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountKeeper, app.feeCollectionKeeper))
 
 	app.Router().
@@ -98,6 +114,8 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 		app.keyAccount,
 		app.keyEM,
 		app.keyECM,
+		app.keyMA,
+		app.keyU,
 		app.keyFeeCollection,
 		app.keyParams,
 		app.tkeyParams,

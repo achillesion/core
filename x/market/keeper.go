@@ -5,27 +5,27 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	emTypes "github.com/marbar3778/tic_mark/types"
-	em "github.com/marbar3778/tic_mark/x/eventmaker" // add expected_types so you aren't importing 
+	em "github.com/marbar3778/tic_mark/x/eventmaker" // add expected_types so you aren't importing
 )
 
 //  Keeper for the market module
-type Keeper struct { 
-	// TODO: add in em keeper in newKeeper instead of import
-	cKeeper bank.Keeper
-	eKey    sdk.StoreKey // upcoming event key where the tickets will be held
-	mKey    sdk.StoreKey // marketplace key for reselling
-	uKey    sdk.StoreKey // store to keep an array of all the users that have tickets
-	cdc     *codec.Codec
+type Keeper struct {
+	EventKeeper em.BaseKeeper
+	cKeeper     bank.Keeper
+	eKey        sdk.StoreKey // upcoming event key where the tickets will be held
+	mKey        sdk.StoreKey // marketplace key for reselling
+	uKey        sdk.StoreKey // store to keep an array of all the users that have tickets
+	cdc         *codec.Codec
 }
 
-func NewKeeper(cKeeper bank.Keeper, eKey sdk.StoreKey, mKey sdk.StoreKey, uKey sdk.StoreKey, cdc *codec.Codec) Keeper {
+func NewKeeper(cKeeper bank.Keeper, eKey sdk.StoreKey, mKey sdk.StoreKey, uKey sdk.StoreKey, cdc *codec.Codec, eventKeeper em.BaseKeeper) Keeper {
 	return Keeper{
-		// TODO: add in em keeper in newKeeper instead of import
-		cKeeper: cKeeper,
-		eKey:    eKey,
-		mKey:    mKey,
-		uKey:    uKey,
-		cdc:     cdc,
+		EventKeeper: eventKeeper,
+		cKeeper:     cKeeper,
+		eKey:        eKey,
+		mKey:        mKey,
+		uKey:        uKey,
+		cdc:         cdc,
 	}
 }
 
@@ -76,12 +76,15 @@ func (k Keeper) SetTicket(ctx sdk.Context, storeKey sdk.StoreKey, eventID string
 
 // Create Ticket based off the data from the event
 func (k Keeper) CreateTicket(ctx sdk.Context, eventID string, ownerName string, ownerAddress sdk.AccAddress) { // add ticket to UKey and EKey
-	event := em.GetOpenEvent(ctx, eventID)
+	event, ok := em.BaseKeeper.GetOpenEvent(ctx, eventID)
+	if !ok {
+		panic("error")
+	}
 	ticketData := event.TicketData
 	ticket := emTypes.CreateTicket(ownerName, ownerAddress, eventID,
 		ticketData.InitialPrice, ticketData.TicketsSold, ticketData.TotalTickets, ticketData.MarkUpAllowed,
 		ticketData.Resale, ticketData.InitialPrice)
-	ticketData.TicketNumber = ticketData.TicketNumber + 1
+	ticketData.TicketsSold = ticketData.TicketsSold + 1
 	k.SetTicket(ctx, k.eKey, eventID, ticket) // set ticket to event store
 	k.SetTicket(ctx, k.uKey, eventID, ticket) // set ticket to event store
 }
@@ -95,14 +98,14 @@ func (k Keeper) ResaleTicket(ctx sdk.Context, ticketID string, eventID string) {
 func (k Keeper) AddTicketToMarket(ctx sdk.Context, ticketID string, eventID string, sellingPrice int) {
 	ticket := k.GetTicket(ctx, ticketID, eventID)
 
-		// ticket.SetNewPrice(ticket.)
-		// need to check if first time in sale to use orignial price
-		// if not then get maxmarkupallowed and proposed price to see if its within purposed price
-		// put inital price
+	// ticket.SetNewPrice(ticket.)
+	// need to check if first time in sale to use orignial price
+	// if not then get maxmarkupallowed and proposed price to see if its within purposed price
+	// put inital price
 	k.SetTicket(ctx, k.mKey, eventID, ticket)
 }
 
-func (k Keeper ) SellTicket
+// func (k Keeper ) SellTicket
 
 // uStore := ctx.KVStore(k.uKey)
 // uStore.Delete make it delete a single entry of the key not the key
