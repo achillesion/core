@@ -28,13 +28,12 @@ type eventMarketApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
-	keyMain    *sdk.KVStoreKey
-	keyAccount *sdk.KVStoreKey
-	keyEM      *sdk.KVStoreKey // key for upcoming event store
-	keyECM     *sdk.KVStoreKey // key for closed event store
-	keyMA      *sdk.KVStoreKey // marketplace store
-	keyU       *sdk.KVStoreKey // user ticket store
-
+	keyMain          *sdk.KVStoreKey
+	keyAccount       *sdk.KVStoreKey
+	keyEM            *sdk.KVStoreKey // key for upcoming event store
+	keyECM           *sdk.KVStoreKey // key for closed event store
+	keyMA            *sdk.KVStoreKey // marketplace store
+	keyU             *sdk.KVStoreKey // user ticket store
 	keyFeeCollection *sdk.KVStoreKey
 	keyParams        *sdk.KVStoreKey
 	tkeyParams       *sdk.TransientStoreKey
@@ -89,14 +88,14 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 		app.cdc,
 	)
 
-	// app.marketKeeper = market.NewKeeper( // TODO: add access to eventmaker module
-	// 	app.bankKeeper,
-	// 	app.keyEM,
-	// 	app.keyMA,
-	// 	app.keyU,
-	// 	app.cdc,
-	//	app.emKeeper,
-	// )
+	app.marketKeeper = market.NewKeeper(
+		app.bankKeeper,
+		app.keyEM,
+		app.keyMA,
+		app.keyU,
+		app.cdc,
+		app.emKeeper,
+	)
 
 	app.SetAnteHandler(auth.NewAnteHandler(app.accountKeeper, app.feeCollectionKeeper))
 
@@ -136,6 +135,7 @@ func MakeCodec() *codec.Codec {
 	sdk.RegisterCodec(cdc)
 	codec.RegisterCrypto(cdc)
 	eventmaker.RegisterCodec(cdc)
+	market.RegisterCodec((cdc))
 	return cdc
 }
 

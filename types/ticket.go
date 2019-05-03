@@ -15,7 +15,7 @@ type Ticket struct {
 	InitialPrice    sdk.Coin       // original price of the item, if initialPrice is 0 then its a free event
 	TicketNumber    int            // if the parent wants to make more than one
 	TotalTickets    int            // to give the user a sense of power that they are the only one with this number
-	MarkUpAllowed   int            // amount of the current price (originalPrice || newPrice)
+	MarkUpAllowed   int64          // amount of the current price (originalPrice || newPrice)
 	Resale          bool           // if the ticket is allowed to enter the market place
 	ResaleCounter   int            // amount of times it the item has been resold
 	Price           sdk.Coin       // price that the item will be resold for
@@ -23,7 +23,7 @@ type Ticket struct {
 
 func CreateTicket(ownerName string, ownerAddress sdk.AccAddress, parentReference string,
 	initialPrice sdk.Coin, ticketNumber int, totalTickets int,
-	markUpAllowed int, resale bool, price sdk.Coin) Ticket {
+	markUpAllowed int64, resale bool, price sdk.Coin) Ticket {
 
 	out, err := exec.Command("uuidgen").Output()
 	if err != nil {
@@ -48,25 +48,40 @@ func CreateTicket(ownerName string, ownerAddress sdk.AccAddress, parentReference
 }
 
 // Set new price
-func (t Ticket) SetNewPrice(oldPrice sdk.Coin, markUp int) sdk.Coin {
+func (t Ticket) getNewPrice(price sdk.Coin, markUp int64) sdk.Coin {
+	oneHundred := 100
+	var percent int64
+	percent = int64(oneHundred)
+	previousPrice := price.Amount.Int64()
+	markedUpAmount := markUp / percent
+	markUpPrice := previousPrice * markedUpAmount
+	price.Amount = sdk.NewInt(markUpPrice)
+	return price
+}
 
-	// maxMarkUp := markUp / 100
-	// markUpAmount := oldPrice.Amount * maxMarkUp
-	return oldPrice
+func (t Ticket) ResaleTicket(ownerName string, ownerAddress sdk.AccAddress) {
+	t.OwnerName = ownerName
+	t.OwnerAddress = ownerAddress
+
+	// t.Price = t.SetNewPrice(markUp)
 }
 
 // Get the new price of the ticket for resale
-func (t Ticket) GetMaxNewPrice(markUp int) sdk.Coin {
+func (t Ticket) SetNewPrice(markUp int64) sdk.Coin {
 	if !t.Resale {
 		panic("Can not enter the marketplace")
 	}
+	if markUp > t.MarkUpAllowed {
+		panic("The markup suggested is to great")
+	}
 	if t.ResaleCounter > 1 {
-		t.Price.Add(t.SetNewPrice(t.InitialPrice, markUp))
+		t.Price.Add(t.getNewPrice(t.InitialPrice, markUp))
 		t.ResaleCounter++
 		return t.Price
 	}
+
 	t.ResaleCounter++
-	t.Price.Add(t.SetNewPrice(t.Price, markUp))
+	t.Price.Add(t.getNewPrice(t.Price, markUp))
 	return t.Price
 }
 
@@ -80,12 +95,6 @@ func (t Ticket) SetNewOwner(ownerName string, ownerAddress sdk.AccAddress) strin
 	t.OwnerName = ownerName
 	t.OwnerAddress = ownerAddress
 	return fmt.Sprintf("New Ticket Owner: %s, New Ticket Owner Address: %s", t.OwnerName, t.OwnerAddress)
-}
-
-func (t Ticket) ResaleTicket(ownerName string, ownerAddress sdk.AccAddress, resalePrice int) {
-	t.OwnerName = ownerName
-	t.OwnerAddress = ownerAddress
-	t.Price = t.InitialPrice // change me
 }
 
 // Get my ticket number
