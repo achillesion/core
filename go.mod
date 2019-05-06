@@ -10,6 +10,7 @@ require (
 	github.com/ethereum/go-ethereum v1.8.23 // indirect
 	github.com/gogo/protobuf v1.2.1 // indirect
 	github.com/golang/protobuf v1.3.0 // indirect
+	github.com/google/go-cmp v0.3.0
 	github.com/gorilla/mux v1.7.0
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-isatty v0.0.7 // indirect
