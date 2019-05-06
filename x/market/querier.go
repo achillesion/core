@@ -28,18 +28,16 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 }
 
 func queryAllTickets(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) (res []byte, err sdk.Error) {
-	var list []string
 
 	event := path[0]
 
-	iterator := k.GetTickets(ctx, event)
-
-	for ; iterator.Valid(); iterator.Next() {
-		eventID := string(iterator.Key())
-		list = append(list, eventID)
+	// get all the tickets
+	tickets, ok := k.GetTickets(ctx, event)
+	if !ok {
+		panic("something")
 	}
 
-	bz, err2 := codec.MarshalJSONIndent(k.cdc, list)
+	bz, err2 := codec.MarshalJSONIndent(k.cdc, tickets)
 	if err2 != nil {
 		panic(err2)
 	}
@@ -50,7 +48,10 @@ func queryTicket(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper
 	event := path[0]
 	ticket := path[1]
 
-	value := k.GetTicket(ctx, event, ticket)
+	value, ok := k.GetTicket(ctx, event, ticket)
+	if !ok {
+		panic("No ticket")
+	}
 
 	bz, err2 := codec.MarshalJSONIndent(k.cdc, value)
 	if err2 != nil {
@@ -60,17 +61,15 @@ func queryTicket(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper
 }
 
 func queryMarketPlace(ctx sdk.Context, path []string, req abci.RequestQuery, k Keeper) (res []byte, err sdk.Error) {
-	var list []string
 
 	event := path[0]
 
-	iterator := k.GetMarketPlaceTickets(ctx, event)
-
-	for ; iterator.Valid(); iterator.Next() {
-		eventID := string(iterator.Key())
-		list = append(list, eventID)
+	tickets, ok := k.GetMarketPlaceTickets(ctx, event)
+	if !ok {
+		panic("Nothing in the market place for you")
 	}
-	bz, err2 := codec.MarshalJSONIndent(k.cdc, list)
+
+	bz, err2 := codec.MarshalJSONIndent(k.cdc, tickets)
 	if err2 != nil {
 		panic("could not marshal result to JSON")
 	}

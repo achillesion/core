@@ -101,10 +101,14 @@ func (k Keeper) SetTicket(ctx sdk.Context, storeKey sdk.StoreKey, eventID string
 
 // Delete the ticket from the marketplace
 func (k Keeper) DeleteMarketTicket(ctx sdk.Context, eventID string, ticketID string) {
-	store := ctx.KVStore(k.mKey)
 	tickets, ok := k.GetMarketPlaceTickets(ctx, eventID)
 	if !ok {
-		panic("")
+		panic("Something")
+	}
+	for _, ticket := range tickets {
+		if ticket.TicketID == ticketID {
+			// delete me
+		}
 	}
 }
 
@@ -189,12 +193,17 @@ func (k Keeper) SellTicket(ctx sdk.Context, ticketID string, eventID string,
 
 	ticket.ResaleTicket(newOwnerName, newOwnerAddress)
 
-	eventTicket, ok := k.GetTicket(ctx, eventID, ticketID)
+	eventTickets, ok := k.GetTickets(ctx, eventID)
 	if !ok {
 		panic("No ticket with that ID")
 	}
 
-	ticketEvent = ticket
-	k.SetTicket(ctx, k.eKey, eventID, ticketEvent)
+	// find and replace the existing ticket
+	for _, eTicket := range eventTickets {
+		if eTicket.TicketID == ticket.TicketID {
+			eTicket = ticket
+		}
+	}
 
+	k.SetTicket(ctx, k.eKey, eventID, eventTickets)
 }
