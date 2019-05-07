@@ -19,7 +19,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a // indirect
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.3.2
-	github.com/stretchr/testify v1.3.0 // indirect
+	github.com/stretchr/testify v1.3.0
 	github.com/tendermint/go-amino v0.14.1
 	github.com/tendermint/tendermint v0.31.4
 	github.com/zondax/ledger-go v0.8.0 // indirect

@@ -2,7 +2,8 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/google/go-cmp/cmp"
+	// "github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert" // TODO: use me
 	"testing"
 )
 
@@ -40,18 +41,14 @@ var event = Event{
 
 func TestCreateEvent(t *testing.T) {
 	eventData := CreateEvent("ME", 10, "You", sdk.AccAddress{byte('A')}, true, dataTicket, detailsEvent)
-	if event.EventName != eventData.EventName {
-		t.Errorf("Error Expected %s got %s", event.EventName, eventData.EventName)
-	}
-	if event.EventOwner != eventData.EventOwner {
-		t.Errorf("Error Expected %s got %s", event.EventOwner, eventData.EventOwner)
-	}
-	if !cmp.Equal(event.EventOwnerAddress, eventData.EventOwnerAddress) {
-		t.Errorf("Error Expected %s got %s", event.EventOwnerAddress, eventData.EventOwnerAddress)
-	}
-	if event.TicketData != eventData.TicketData {
-		t.Error("Error Expected")
-	}
+
+	assert.Equal(t, event.EventName, eventData.EventName, "they should be equal")
+
+	assert.Equal(t, event.EventOwner, eventData.EventOwner, "They should be equal")
+
+	assert.Equal(t, event.EventOwnerAddress, eventData.EventOwnerAddress, "Equal Addresses")
+
+	assert.Equal(t, event.TicketData, eventData.TicketData, "Ticket Data should be equal")
 }
 
 func TestValidEventCreation(t *testing.T) {
@@ -67,24 +64,21 @@ func TestValidEventCreation(t *testing.T) {
 func TestTicketDetails(t *testing.T) {
 	eventData := CreateEvent("ME", 10, "You", sdk.AccAddress{byte('A')}, true, dataTicket, detailsEvent)
 	ticketDets := eventData.GetTicketDetails()
-	if ticketDets != dataTicket {
-		t.Error("Expected the above ticket data")
-	}
+
+	assert.Equal(t, ticketDets, dataTicket, "Expected the ticket data to be equal")
 }
 
 func TestEventDetails(t *testing.T) {
 	eventData := CreateEvent("ME", 10, "You", sdk.AccAddress{byte('A')}, true, dataTicket, detailsEvent)
 	eventDets := eventData.GetEventDetails()
-	if eventDets != detailsEvent {
-		t.Error("Expected the above event data")
-	}
+
+	assert.Equal(t, eventDets, detailsEvent, "event details should be equal")
 }
 
 func TestSetDate(t *testing.T) {
 	eventData := CreateEvent("ME", 10, "You", sdk.AccAddress{byte('A')}, true, dataTicket, detailsEvent)
 	newDate := "01.01.2021"
 	date := eventData.SetDate(newDate)
-	if date.Date != newDate {
-		t.Errorf("Expected: %s, Got: %s", newDate, eventData.EventDetail.Date)
-	}
+
+	assert.Equal(t, date.Date, newDate, "Dates should be equal")
 }
