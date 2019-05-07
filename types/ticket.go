@@ -47,16 +47,22 @@ func CreateTicket(ownerName string, ownerAddress sdk.AccAddress, parentReference
 	}
 }
 
+// 1 tic = 100htic
+
 // Set new price
-func (t Ticket) getNewPrice(price sdk.Coin, markUp int64) sdk.Coin {
-	oneHundred := 100
-	var percent int64
-	percent = int64(oneHundred)
-	previousPrice := price.Amount.Int64()
-	markedUpAmount := markUp / percent
-	markUpPrice := previousPrice * markedUpAmount
-	price.Amount = sdk.NewInt(markUpPrice)
-	return price
+func (t Ticket) getNewPrice(markUp int64) sdk.Coin { // TODO: Fixme
+	percent := int64(100)
+	Amount := t.Price.Amount.Int64()
+
+	markUpAmount := ((markUp * percent) / Amount)
+
+	fmt.Println(markUpAmount)
+
+	newAmount := sdk.NewInt(markUpAmount)
+
+	t.Price.Amount = t.Price.Amount.Add(newAmount)
+
+	return t.Price
 }
 
 func (t Ticket) ResaleTicket(ownerName string, ownerAddress sdk.AccAddress) {
@@ -67,34 +73,25 @@ func (t Ticket) ResaleTicket(ownerName string, ownerAddress sdk.AccAddress) {
 }
 
 // Get the new price of the ticket for resale
-func (t Ticket) SetNewPrice(markUp int64) sdk.Coin {
+func (t Ticket) SetNewPrice(markUp int64) Ticket {
 	if !t.Resale {
 		panic("Can not enter the marketplace")
 	}
 	if markUp > t.MarkUpAllowed {
 		panic("The markup suggested is to great")
 	}
-	if t.ResaleCounter > 1 {
-		t.Price.Add(t.getNewPrice(t.InitialPrice, markUp))
-		t.ResaleCounter++
-		return t.Price
-	}
 
 	t.ResaleCounter++
-	t.Price.Add(t.getNewPrice(t.Price, markUp))
-	return t.Price
-}
+	t.Price = t.getNewPrice(markUp)
 
-// Get the current owner of the ticker
-func (t Ticket) GetCurrentOwner() string {
-	return fmt.Sprintf("Ticket Owner: %s, Ticket Owner Address: %s", t.OwnerName, t.OwnerAddress.String())
+	return t
 }
 
 // Set new owner TODO: make changes be immutable, spawn a new ticket
-func (t Ticket) SetNewOwner(ownerName string, ownerAddress sdk.AccAddress) string {
+func (t Ticket) SetNewOwner(ownerName string, ownerAddress sdk.AccAddress) Ticket {
 	t.OwnerName = ownerName
 	t.OwnerAddress = ownerAddress
-	return fmt.Sprintf("New Ticket Owner: %s, New Ticket Owner Address: %s", t.OwnerName, t.OwnerAddress)
+	return t
 }
 
 // Get my ticket number

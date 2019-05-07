@@ -70,3 +70,7 @@ type Keeper struct {
 - As an event owner I want to receive a cut from the resale of my tickets only if its over the original price
 - As a user I have to pay for the transaction fee (unless its a free event)
 - As a user I want to see all the offered tickets for any given event on the marketplace
+
+### Token Bases
+
+- The token 1 tic = 100 htic (hecta)
