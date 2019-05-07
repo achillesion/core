@@ -1,10 +1,10 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	// "github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert" // TODO: use me
 	"testing"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/assert"
 )
 
 var oneHundred = 100

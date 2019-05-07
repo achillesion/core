@@ -2,15 +2,14 @@ package client
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
+	market "github.com/marbar3778/tic_mark/x/market/client/cli"
 	"github.com/spf13/cobra"
 	amino "github.com/tendermint/go-amino"
-	market "github.com/marbar3778/tic_mark/x/market/client/cli"
-
-
 )
+
 type ModuleClient struct {
 	storeKey string
-	cdc *amino.Codec
+	cdc      *amino.Codec
 }
 
 func NewModuleClient(storeKey string, cdc *amino.Codec) ModuleClient {
@@ -19,13 +18,13 @@ func NewModuleClient(storeKey string, cdc *amino.Codec) ModuleClient {
 
 func (mc ModuleClient) GetQueryCmd() *cobra.Command {
 	ticketQueryCmd := &cobra.Command{
-		Use: "ticketmarket",
-		Short: "Query for the ticket market"
+		Use:   "ticketmarket",
+		Short: "Query for the ticket market",
 	}
 
 	ticketQueryCmd.AddCommand(client.GetCommand(
 		market.GetCmdGetTickets(mc.storeKey, mc.cdc),
-		market.GetCmdGetTicket(mc.storeKey, mc.cdc)
+		market.GetCmdGetTicket(mc.storeKey, mc.cdc),
 	)...)
 
 	ticketQueryCmd.AddCommand(client.PostCommands(
