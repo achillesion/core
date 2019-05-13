@@ -1,7 +1,6 @@
 package market
 
 import (
-	"encoding/json"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -44,11 +43,7 @@ func (msg MsgCreateTicket) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCreateTicket) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
+	return sdk.MustSortJSON(msgCdc.MustMarshalJSON(msg))
 }
 
 type MsgAddTicketToMarket struct {
@@ -84,9 +79,5 @@ func (msg MsgAddTicketToMarket) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgAddTicketToMarket) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
+	return sdk.MustSortJSON(msgCdc.MustMarshalJSON(msg))
 }

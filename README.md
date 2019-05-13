@@ -42,7 +42,8 @@ make lint
 
 ## Things to do:
 
-- Makefile
-  - build & install
-- market module coding
-- write tests
+- write tests for modules
+- percentage markup with no floats
+- testing testnets
+- swagger file for restapi
+- keyserver adaptation for jwt Token and

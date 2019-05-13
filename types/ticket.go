@@ -55,7 +55,7 @@ func (t Ticket) getNewPrice(markUp int64) sdk.Coin { // TODO: Fixme
 	Amount := t.Price.Amount.Int64()
 
 	markUpAmount := ((markUp * percent) / Amount)
-
+	fmt.Println(markUp)
 	fmt.Println(markUpAmount)
 
 	newAmount := sdk.NewInt(markUpAmount)

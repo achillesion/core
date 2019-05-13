@@ -8,3 +8,9 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgNewOwner{}, "eventmaker/NewOwner", nil)
 	cdc.RegisterConcrete(MsgCloseEvent{}, "eventmaker/CloseEvent", nil)
 }
+
+var msgCdc = codec.New()
+
+func init() {
+	RegisterCodec(msgCdc)
+}

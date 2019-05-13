@@ -58,7 +58,7 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 		keyAccount:       sdk.NewKVStoreKey("acc"),
 		keyEM:            sdk.NewKVStoreKey("em"),
 		keyECM:           sdk.NewKVStoreKey("closed_events"),
-		keyMA:            sdk.NewKVStoreKey("market"),
+		keyMA:            sdk.NewKVStoreKey("resale_market"),
 		keyU:             sdk.NewKVStoreKey("user_account"),
 		keyFeeCollection: sdk.NewKVStoreKey("fee_collection"),
 		keyParams:        sdk.NewKVStoreKey("params"),

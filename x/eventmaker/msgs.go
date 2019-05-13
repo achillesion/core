@@ -1,7 +1,6 @@
 package eventmaker
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/marbar3778/tic_mark/types"
@@ -61,11 +60,7 @@ func (msg MsgCreateEvent) ValidateBasic() sdk.Error {
 
 // GetSignBytes - receive message bytes for signer to sign
 func (msg MsgCreateEvent) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
+	return sdk.MustSortJSON(msgCdc.MustMarshalJSON(msg))
 }
 
 // MsgNewOwner : set new owner of the event constructor
@@ -109,11 +104,7 @@ func (msg MsgNewOwner) ValidateBasic() sdk.Error {
 
 // GetSignBytes - receive message bytes for signer to sign
 func (msg MsgNewOwner) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
+	return sdk.MustSortJSON(msgCdc.MustMarshalJSON(msg))
 }
 
 // MsgCloseEvent : struct to close an event
@@ -148,9 +139,5 @@ func (msg MsgCloseEvent) ValidateBasic() sdk.Error {
 }
 
 func (msg MsgCloseEvent) GetSignBytes() []byte {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		panic(err)
-	}
-	return sdk.MustSortJSON(b)
+	return sdk.MustSortJSON(msgCdc.MustMarshalJSON(msg))
 }
