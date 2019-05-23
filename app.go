@@ -54,29 +54,31 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 	var app = &eventMarketApp{
 		BaseApp:          bApp,
 		cdc:              cdc,
-		keyMain:          sdk.NewKVStoreKey("main"),
-		keyAccount:       sdk.NewKVStoreKey("acc"),
-		keyEM:            sdk.NewKVStoreKey("em"),
-		keyECM:           sdk.NewKVStoreKey("closed_events"),
+		keyMain:          sdk.NewKVStoreKey(bam.MainStoreKey),
+		keyAccount:       sdk.NewKVStoreKey(auth.StoreKey),
+		keyEM:            sdk.NewKVStoreKey(eventmaker.OpenEventKey),
+		keyECM:           sdk.NewKVStoreKey(eventmaker.ClosedEventKey),
 		keyMA:            sdk.NewKVStoreKey("resale_market"),
 		keyU:             sdk.NewKVStoreKey("user_account"),
-		keyFeeCollection: sdk.NewKVStoreKey("fee_collection"),
-		keyParams:        sdk.NewKVStoreKey("params"),
-		tkeyParams:       sdk.NewTransientStoreKey("transient_params"),
+		keyFeeCollection: sdk.NewKVStoreKey(auth.FeeStoreKey),
+		keyParams:        sdk.NewKVStoreKey(params.StoreKey),
+		tkeyParams:       sdk.NewTransientStoreKey(params.TStoreKey),
 	}
 
 	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams, app.tkeyParams)
+	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
+	bankSubspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
 
 	app.accountKeeper = auth.NewAccountKeeper(
 		app.cdc,
 		app.keyAccount,
-		app.paramsKeeper.Subspace(auth.DefaultParamspace),
+		authSubspace,
 		auth.ProtoBaseAccount,
 	)
 
 	app.bankKeeper = bank.NewBaseKeeper(
 		app.accountKeeper,
-		app.paramsKeeper.Subspace(bank.DefaultParamspace),
+		bankSubspace,
 		bank.DefaultCodespace,
 	)
 

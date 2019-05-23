@@ -8,6 +8,8 @@ import (
 	em "github.com/marbar3778/tic_mark/x/eventmaker" // add expected_types so you aren't importing
 )
 
+const StoreKey = "market"
+
 //  Keeper for the market module
 type Keeper struct {
 	EventKeeper em.BaseKeeper

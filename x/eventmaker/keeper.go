@@ -7,6 +7,9 @@ import (
 	emTypes "github.com/marbar3778/tic_mark/types"
 )
 
+const OpenEventKey = "openEventKey"
+const ClosedEventKey = "closedEventKey"
+
 type Keeper interface {
 	GetOpenEvent(ctx sdk.Context, eventID string) (event emTypes.Event, ok bool)
 }
