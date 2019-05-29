@@ -40,7 +40,7 @@ var event = Event{
 }
 
 func TestCreateEvent(t *testing.T) {
-	eventData := CreateEvent("ME", 10, "You", sdk.AccAddress{byte('A')}, true, dataTicket, detailsEvent)
+	eventData := CreateEvent("ME", 10, "You", v, true, dataTicket, detailsEvent)
 
 	assert.Equal(t, event.EventName, eventData.EventName, "they should be equal")
 

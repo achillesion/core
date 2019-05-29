@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	emTypes "github.com/marbar3778/tic_mark/types"
+	emtypes "github.com/marbar3778/tic_mark/x/eventmaker/types"
 )
 
 var (
@@ -14,7 +14,7 @@ var (
 )
 
 type Keeper interface {
-	GetOpenEvent(ctx sdk.Context, eventID string) (event emTypes.Event, ok bool)
+	GetOpenEvent(ctx sdk.Context, eventID string) (event emtypes.Event, ok bool)
 }
 
 // Keeper to house the events and tickets
@@ -36,25 +36,25 @@ func NewKeeper(eventKey sdk.StoreKey, closedEventKey sdk.StoreKey, cdc *codec.Co
 // GETTERS
 
 // Get only open events
-func (k BaseKeeper) GetOpenEvent(ctx sdk.Context, eventID string) (event emTypes.Event, ok bool) {
+func (k BaseKeeper) GetOpenEvent(ctx sdk.Context, eventID string) (event emtypes.Event, ok bool) {
 	store := ctx.KVStore(k.eKey)
 	eventData := store.Get([]byte(eventID))
 	if eventData == nil {
-		return emTypes.Event{}, false
+		return emtypes.Event{}, false
 	}
-	var Event emTypes.Event
+	var Event emtypes.Event
 	k.cdc.MustUnmarshalBinaryBare(eventData, &Event)
 	return Event, true
 }
 
 // GetClosedEvent - Get specific Event
-func (k BaseKeeper) GetClosedEvent(ctx sdk.Context, eventID string) (event emTypes.Event, ok bool) {
+func (k BaseKeeper) GetClosedEvent(ctx sdk.Context, eventID string) (event emtypes.Event, ok bool) {
 	store := ctx.KVStore(k.ceKey)
 	eventData := store.Get([]byte(eventID))
 	if eventData == nil {
-		return emTypes.Event{}, false
+		return emtypes.Event{}, false
 	}
-	var Event emTypes.Event
+	var Event emtypes.Event
 	k.cdc.MustUnmarshalBinaryLengthPrefixed(eventData, &Event)
 	return Event, true
 }
@@ -77,7 +77,7 @@ func (k BaseKeeper) GetAllEvents(ctx sdk.Context, storeKey sdk.StoreKey) sdk.Ite
 // SETTERS
 
 // SetEvent - Set event into store
-func (k BaseKeeper) SetEvent(ctx sdk.Context, eventID string, eventData emTypes.Event,
+func (k BaseKeeper) SetEvent(ctx sdk.Context, eventID string, eventData emtypes.Event,
 	storeKey sdk.StoreKey) {
 	store := ctx.KVStore(k.eKey)
 	store.Set([]byte(eventID), k.cdc.MustMarshalBinaryBare(eventData))
@@ -115,8 +115,8 @@ func (k BaseKeeper) NewOwner(ctx sdk.Context, eventID string, previousOwnerAddre
 // CreateEvent - Create event
 func (k BaseKeeper) CreateEvent(ctx sdk.Context, eventName string, totalTickets int,
 	eventOwner string, eventOwnerAddress sdk.AccAddress, resale bool,
-	ticketData emTypes.TicketData, eventDetails emTypes.EventDetails) {
-	eventData := emTypes.CreateEvent(eventName, totalTickets, eventOwner,
+	ticketData emtypes.TicketData, eventDetails emtypes.EventDetails) {
+	eventData := emtypes.CreateEvent(eventName, totalTickets, eventOwner,
 		eventOwnerAddress, resale, ticketData,
 		eventDetails)
 	k.SetEvent(ctx, eventName, eventData, k.eKey)

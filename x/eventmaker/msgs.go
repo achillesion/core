@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const RouterKey = "eventmaker"
+const RouterKey = ModuleName
 
 // MsgCreateEvent : Msg to create event
 type MsgCreateEvent struct {

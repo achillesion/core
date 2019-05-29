@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const RouterKey = "market"
+const RouterKey = ModuleName
 
 type MsgCreateTicket struct {
 	EventID      string         `json:"event_id"`

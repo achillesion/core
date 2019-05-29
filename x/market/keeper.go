@@ -4,8 +4,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	emTypes "github.com/marbar3778/tic_mark/types"
 	em "github.com/marbar3778/tic_mark/x/eventmaker" // add expected_types so you aren't importing
+	emtypes "github.com/marbar3778/tic_mark/x/market/types"
 )
 
 const StoreKey = "market"
@@ -34,33 +34,33 @@ func NewKeeper(cKeeper bank.Keeper, eKey sdk.StoreKey, mKey sdk.StoreKey, uKey s
 // Getters
 
 // Get all tickets of an event
-func (k Keeper) GetTickets(ctx sdk.Context, eventID string) (tickets []emTypes.Ticket, ok bool) {
+func (k Keeper) GetTickets(ctx sdk.Context, eventID string) (tickets []emtypes.Ticket, ok bool) {
 	store := ctx.KVStore(k.eKey)
 	event := store.Get([]byte(eventID))
 	if event == nil {
 		return nil, false
 	}
 
-	var Tickets []emTypes.Ticket
+	var Tickets []emtypes.Ticket
 	k.cdc.MustUnmarshalBinaryBare(event, &Tickets)
 	return Tickets, true
 }
 
-func (k Keeper) GetMarketPlaceTickets(ctx sdk.Context, eventID string) (tickets []emTypes.Ticket, ok bool) {
+func (k Keeper) GetMarketPlaceTickets(ctx sdk.Context, eventID string) (tickets []emtypes.Ticket, ok bool) {
 	store := ctx.KVStore(k.mKey)
 	event := store.Get([]byte(eventID))
 	if event == nil {
 		return nil, false
 	}
-	var Tickets []emTypes.Ticket
+	var Tickets []emtypes.Ticket
 	k.cdc.MustUnmarshalBinaryBare(event, &Tickets)
 	return Tickets, true
 }
 
-func (k Keeper) GetMarketPlaceTicket(ctx sdk.Context, eventID string, ticketID string) emTypes.Ticket {
+func (k Keeper) GetMarketPlaceTicket(ctx sdk.Context, eventID string, ticketID string) emtypes.Ticket {
 	store := ctx.KVStore(k.mKey)
 	event := store.Get([]byte(eventID))
-	var Tickets []emTypes.Ticket
+	var Tickets []emtypes.Ticket
 	k.cdc.MustUnmarshalBinaryBare(event, &Tickets)
 	for _, t := range Tickets {
 		if t.TicketID == ticketID {
@@ -71,24 +71,24 @@ func (k Keeper) GetMarketPlaceTicket(ctx sdk.Context, eventID string, ticketID s
 }
 
 // Get Individual Ticket
-func (k Keeper) GetTicket(ctx sdk.Context, eventID string, ticketID string) (ticket emTypes.Ticket, ok bool) {
+func (k Keeper) GetTicket(ctx sdk.Context, eventID string, ticketID string) (ticket emtypes.Ticket, ok bool) {
 	store := ctx.KVStore(k.eKey)
 	event := store.Get([]byte(eventID))
-	var Tickets []emTypes.Ticket
+	var Tickets []emtypes.Ticket
 	k.cdc.MustUnmarshalBinaryBare(event, &Tickets)
 	for _, t := range Tickets {
 		if t.TicketID == ticketID {
 			return t, true
 		}
 	}
-	return emTypes.Ticket{}, false
+	return emtypes.Ticket{}, false
 }
 
 // Get all tickets that a user may have
-func (k Keeper) GetUserTickets(ctx sdk.Context, userAddress sdk.AccAddress) []emTypes.Ticket {
+func (k Keeper) GetUserTickets(ctx sdk.Context, userAddress sdk.AccAddress) []emtypes.Ticket {
 	store := ctx.KVStore(k.uKey)
 	user := store.Get([]byte(userAddress))
-	var Tickets []emTypes.Ticket
+	var Tickets []emtypes.Ticket
 	k.cdc.MustUnmarshalBinaryBare(user, &Tickets)
 	return Tickets
 }
@@ -96,7 +96,7 @@ func (k Keeper) GetUserTickets(ctx sdk.Context, userAddress sdk.AccAddress) []em
 // Setters
 
 // SetTicket into stores
-func (k Keeper) SetTicket(ctx sdk.Context, storeKey sdk.StoreKey, eventID string, ticketData []emTypes.Ticket) {
+func (k Keeper) SetTicket(ctx sdk.Context, storeKey sdk.StoreKey, eventID string, ticketData []emtypes.Ticket) {
 	store := ctx.KVStore(storeKey)
 	store.Set([]byte(eventID), k.cdc.MustMarshalBinaryBare(ticketData))
 }
@@ -126,7 +126,7 @@ func (k Keeper) CreateTicket(ctx sdk.Context, eventID string, ownerName string, 
 	maxMarkUp = int64(markUp)
 
 	// Creation of the ticket
-	ticket := emTypes.CreateTicket(ownerName, ownerAddress, eventID,
+	ticket := emtypes.CreateTicket(ownerName, ownerAddress, eventID,
 		ticketData.InitialPrice, ticketData.TicketsSold, ticketData.TotalTickets, maxMarkUp,
 		ticketData.Resale, ticketData.InitialPrice)
 	ticketData.TicketsSold = ticketData.TicketsSold + 1
@@ -144,7 +144,7 @@ func (k Keeper) CreateTicket(ctx sdk.Context, eventID string, ownerName string, 
 	ownerKey := ownerAddress.String()
 
 	// append the newly created ticket to the users store
-	var uTickets []emTypes.Ticket
+	var uTickets []emtypes.Ticket
 	uTickets = append(uTickets, ticket)
 	k.SetTicket(ctx, k.uKey, ownerKey, uTickets)
 }
