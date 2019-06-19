@@ -13,7 +13,7 @@ type GenesisState struct {
 func NewGenesisState() GenesisState {
 	return GenesisState{
 		EventTickets: nil,
-		ClosedEvents: nil,
+		MarketPlace:  nil,
 	}
 }
 
