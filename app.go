@@ -1,49 +1,113 @@
 package app
 
 import (
-	"encoding/json"
+	"os"
 
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/crisis"
+	distr "github.com/cosmos/cosmos-sdk/x/distribution"
+	distrclient "github.com/cosmos/cosmos-sdk/x/distribution/client"
+	"github.com/cosmos/cosmos-sdk/x/genaccounts"
+	"github.com/cosmos/cosmos-sdk/x/genutil"
+	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
+	"github.com/cosmos/cosmos-sdk/x/slashing"
+	"github.com/cosmos/cosmos-sdk/x/staking"
+	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/marbar3778/tic_mark/x/eventmaker"
 	"github.com/marbar3778/tic_mark/x/market"
 
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/mint"
 	abci "github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	dbm "github.com/tendermint/tendermint/libs/db"
-	tmtypes "github.com/tendermint/tendermint/types"
 )
 
-const (
-	appName = "tic_mark"
+const appName = "tic_mark"
+
+var (
+	// default home directories for the application CLI
+	DefaultCLIHome = os.ExpandEnv("$HOME/.dtic")
+
+	// default home directories for the application daemon
+	DefaultNodeHome = os.ExpandEnv("$HOME/.dtic")
+
+	// The module BasicManager is in charge of setting up basic,
+	// non-dependant module elements, such as codec registration
+	// and genesis verification.
+	ModuleBasics = module.NewBasicManager(
+		genaccounts.AppModuleBasic{},
+		genutil.AppModuleBasic{},
+		auth.AppModuleBasic{},
+		bank.AppModuleBasic{},
+		staking.AppModuleBasic{},
+		mint.AppModuleBasic{},
+		distr.AppModuleBasic{},
+		gov.NewAppModuleBasic(paramsclient.ProposalHandler, distrclient.ProposalHandler),
+		params.AppModuleBasic{},
+		crisis.AppModuleBasic{},
+		slashing.AppModuleBasic{},
+		supply.AppModuleBasic{},
+	)
 )
+
+// custom tx codec
+func MakeCodec() *codec.Codec {
+	var cdc = codec.New()
+	ModuleBasics.RegisterCodec(cdc)
+	sdk.RegisterCodec(cdc)
+	codec.RegisterCrypto(cdc)
+	return cdc
+}
 
 type eventMarketApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
-	keyMain          *sdk.KVStoreKey
-	keyAccount       *sdk.KVStoreKey
-	keyEM            *sdk.KVStoreKey // key for upcoming event store
-	keyECM           *sdk.KVStoreKey // key for closed event store
-	keyMA            *sdk.KVStoreKey // marketplace store
-	keyU             *sdk.KVStoreKey // user ticket store
-	keyFeeCollection *sdk.KVStoreKey
-	keyParams        *sdk.KVStoreKey
-	tkeyParams       *sdk.TransientStoreKey
+	invCheckPeriod uint
 
-	accountKeeper       auth.AccountKeeper
-	bankKeeper          bank.Keeper
-	feeCollectionKeeper auth.FeeCollectionKeeper
-	paramsKeeper        params.Keeper
-	emKeeper            eventmaker.BaseKeeper
-	marketKeeper        market.Keeper
+	// keys to access the substores
+	keyMain     *sdk.KVStoreKey
+	keyAccount  *sdk.KVStoreKey
+	keySupply   *sdk.KVStoreKey
+	keyStaking  *sdk.KVStoreKey
+	tkeyStaking *sdk.TransientStoreKey
+	keySlashing *sdk.KVStoreKey
+	keyMint     *sdk.KVStoreKey
+	keyDistr    *sdk.KVStoreKey
+	tkeyDistr   *sdk.TransientStoreKey
+	keyGov      *sdk.KVStoreKey
+	keyParams   *sdk.KVStoreKey
+	tkeyParams  *sdk.TransientStoreKey
+	keyEM       *sdk.KVStoreKey // key for upcoming event store
+	keyECM      *sdk.KVStoreKey // key for closed event store
+	keyMA       *sdk.KVStoreKey // marketplace store
+	keyU        *sdk.KVStoreKey // user ticket store
+
+	// keepers
+	accountKeeper  auth.AccountKeeper
+	bankKeeper     bank.Keeper
+	supplyKeeper   supply.Keeper
+	stakingKeeper  staking.Keeper
+	slashingKeeper slashing.Keeper
+	mintKeeper     mint.Keeper
+	distrKeeper    distr.Keeper
+	govKeeper      gov.Keeper
+	crisisKeeper   crisis.Keeper
+	paramsKeeper   params.Keeper
+	emKeeper       eventmaker.BaseKeeper
+	marketKeeper   market.Keeper
+
+	// the module manager
+	mm *module.Manager
 }
 
 func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
@@ -52,75 +116,116 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc))
 
 	var app = &eventMarketApp{
-		BaseApp:          bApp,
-		cdc:              cdc,
-		keyMain:          sdk.NewKVStoreKey(bam.MainStoreKey),
-		keyAccount:       sdk.NewKVStoreKey(auth.StoreKey),
-		keyEM:            sdk.NewKVStoreKey(eventmaker.OpenEventKey),
-		keyECM:           sdk.NewKVStoreKey(eventmaker.ClosedEventKey),
-		keyMA:            sdk.NewKVStoreKey("resale_market"),
-		keyU:             sdk.NewKVStoreKey("user_account"),
-		keyFeeCollection: sdk.NewKVStoreKey(auth.FeeStoreKey),
-		keyParams:        sdk.NewKVStoreKey(params.StoreKey),
-		tkeyParams:       sdk.NewTransientStoreKey(params.TStoreKey),
+		BaseApp:        bApp,
+		cdc:            cdc,
+		invCheckPeriod: invCheckPeriod,
+		keyMain:        sdk.NewKVStoreKey(bam.MainStoreKey),
+		keyAccount:     sdk.NewKVStoreKey(auth.StoreKey),
+		keyStaking:     sdk.NewKVStoreKey(staking.StoreKey),
+		keySupply:      sdk.NewKVStoreKey(supply.StoreKey),
+		tkeyStaking:    sdk.NewTransientStoreKey(staking.TStoreKey),
+		keyMint:        sdk.NewKVStoreKey(mint.StoreKey),
+		keyDistr:       sdk.NewKVStoreKey(distr.StoreKey),
+		tkeyDistr:      sdk.NewTransientStoreKey(distr.TStoreKey),
+		keySlashing:    sdk.NewKVStoreKey(slashing.StoreKey),
+		keyGov:         sdk.NewKVStoreKey(gov.StoreKey),
+		keyParams:      sdk.NewKVStoreKey(params.StoreKey),
+		tkeyParams:     sdk.NewTransientStoreKey(params.TStoreKey),
+		keyEM:          sdk.NewKVStoreKey(eventmaker.OpenEventKey),
+		keyECM:         sdk.NewKVStoreKey(eventmaker.ClosedEventKey),
+		keyMA:          sdk.NewKVStoreKey("resale_market"),
+		keyU:           sdk.NewKVStoreKey("user_account"),
 	}
 
-	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams, app.tkeyParams)
+	// init params keeper and subspaces
+	app.paramsKeeper = params.NewKeeper(app.cdc, app.keyParams, app.tkeyParams, params.DefaultCodespace)
 	authSubspace := app.paramsKeeper.Subspace(auth.DefaultParamspace)
 	bankSubspace := app.paramsKeeper.Subspace(bank.DefaultParamspace)
+	stakingSubspace := app.paramsKeeper.Subspace(staking.DefaultParamspace)
+	mintSubspace := app.paramsKeeper.Subspace(mint.DefaultParamspace)
+	distrSubspace := app.paramsKeeper.Subspace(distr.DefaultParamspace)
+	slashingSubspace := app.paramsKeeper.Subspace(slashing.DefaultParamspace)
+	govSubspace := app.paramsKeeper.Subspace(gov.DefaultParamspace)
+	crisisSubspace := app.paramsKeeper.Subspace(crisis.DefaultParamspace)
 
-	app.accountKeeper = auth.NewAccountKeeper(
-		app.cdc,
-		app.keyAccount,
-		authSubspace,
-		auth.ProtoBaseAccount,
+	// account permissions
+	maccPerms := map[string][]string{
+		auth.FeeCollectorName:     []string{supply.Basic},
+		distr.ModuleName:          []string{supply.Basic},
+		mint.ModuleName:           []string{supply.Minter},
+		staking.BondedPoolName:    []string{supply.Burner, supply.Staking},
+		staking.NotBondedPoolName: []string{supply.Burner, supply.Staking},
+		gov.ModuleName:            []string{supply.Burner},
+	}
+
+	// add keepers
+	app.accountKeeper = auth.NewAccountKeeper(app.cdc, app.keyAccount, authSubspace, auth.ProtoBaseAccount)
+	app.bankKeeper = bank.NewBaseKeeper(app.accountKeeper, bankSubspace, bank.DefaultCodespace)
+	app.supplyKeeper = supply.NewKeeper(app.cdc, app.keySupply, app.accountKeeper, app.bankKeeper, supply.DefaultCodespace, maccPerms)
+	stakingKeeper := staking.NewKeeper(app.cdc, app.keyStaking, app.tkeyStaking,
+		app.supplyKeeper, stakingSubspace, staking.DefaultCodespace)
+	app.mintKeeper = mint.NewKeeper(app.cdc, app.keyMint, mintSubspace, &stakingKeeper, app.supplyKeeper, auth.FeeCollectorName)
+	app.distrKeeper = distr.NewKeeper(app.cdc, app.keyDistr, distrSubspace, &stakingKeeper,
+		app.supplyKeeper, distr.DefaultCodespace, auth.FeeCollectorName)
+	app.slashingKeeper = slashing.NewKeeper(app.cdc, app.keySlashing, &stakingKeeper,
+		slashingSubspace, slashing.DefaultCodespace)
+	app.crisisKeeper = crisis.NewKeeper(crisisSubspace, invCheckPeriod, app.supplyKeeper, auth.FeeCollectorName)
+
+	// register the proposal types
+	govRouter := gov.NewRouter()
+	govRouter.AddRoute(gov.RouterKey, gov.ProposalHandler).
+		AddRoute(params.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
+		AddRoute(distr.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper))
+	app.govKeeper = gov.NewKeeper(app.cdc, app.keyGov, app.paramsKeeper, govSubspace,
+		app.supplyKeeper, &stakingKeeper, gov.DefaultCodespace, govRouter)
+
+	// register the staking hooks
+	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
+	app.stakingKeeper = *stakingKeeper.SetHooks(
+		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()))
+
+	app.mm = module.NewManager(
+		genaccounts.NewAppModule(app.accountKeeper),
+		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
+		auth.NewAppModule(app.accountKeeper),
+		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
+		crisis.NewAppModule(app.crisisKeeper),
+		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
+		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
+		gov.NewAppModule(app.govKeeper, app.supplyKeeper),
+		mint.NewAppModule(app.mintKeeper),
+		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
+		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
 	)
 
-	app.bankKeeper = bank.NewBaseKeeper(
-		app.accountKeeper,
-		bankSubspace,
-		bank.DefaultCodespace,
-	)
+	// During begin block slashing happens after distr.BeginBlocker so that
+	// there is nothing left over in the validator fee pool, so as to keep the
+	// CanWithdrawInvariant invariant.
+	app.mm.SetOrderBeginBlockers(mint.ModuleName, distr.ModuleName, slashing.ModuleName)
 
-	app.feeCollectionKeeper = auth.NewFeeCollectionKeeper(cdc, app.keyFeeCollection)
+	app.mm.SetOrderEndBlockers(gov.ModuleName, staking.ModuleName)
 
-	app.emKeeper = eventmaker.NewKeeper(
-		app.keyEM,
-		app.keyECM,
-		app.cdc,
-	)
+	// genutils must occur after staking so that pools are properly
+	// initialized with tokens from genesis accounts.
+	app.mm.SetOrderInitGenesis(genaccounts.ModuleName, supply.ModuleName, distr.ModuleName,
+		staking.ModuleName, auth.ModuleName, bank.ModuleName, slashing.ModuleName,
+		gov.ModuleName, mint.ModuleName, crisis.ModuleName, genutil.ModuleName)
 
-	app.marketKeeper = market.NewKeeper(
-		app.bankKeeper,
-		app.keyEM,
-		app.keyMA,
-		app.keyU,
-		app.cdc,
-		app.emKeeper,
-	)
+	app.mm.RegisterInvariants(&app.crisisKeeper)
+	app.mm.RegisterRoutes(app.Router(), app.QueryRouter())
 
-	app.SetAnteHandler(auth.NewAnteHandler(app.accountKeeper, app.feeCollectionKeeper))
+	// initialize stores
+	app.MountStores(app.keyMain, app.keyAccount, app.keySupply, app.keyStaking,
+		app.keyMint, app.keyDistr, app.keySlashing, app.keyGov, app.keyParams,
+		app.tkeyParams, app.tkeyStaking, app.tkeyDistr)
 
-	app.Router().
-		AddRoute("bank", bank.NewHandler(app.bankKeeper)).
-		AddRoute("eventmaker", eventmaker.NewHandler(app.emKeeper))
-
-	app.QueryRouter().
-		AddRoute("eventmaker", eventmaker.NewQuerier(app.emKeeper))
+	// initialize BaseApp
+	app.SetInitChainer(app.InitChainer)
+	app.SetBeginBlocker(app.BeginBlocker)
+	app.SetAnteHandler(auth.NewAnteHandler(app.accountKeeper, app.supplyKeeper, auth.DefaultSigVerificationGasConsumer))
+	app.SetEndBlocker(app.EndBlocker)
 
 	app.SetInitChainer(app.initChainer)
-
-	app.MountStores(
-		app.keyMain,
-		app.keyAccount,
-		app.keyEM,
-		app.keyECM,
-		app.keyMA,
-		app.keyU,
-		app.keyFeeCollection,
-		app.keyParams,
-		app.tkeyParams,
-	)
 
 	err := app.LoadLatestVersion(app.keyMain)
 	if err != nil {
@@ -130,69 +235,24 @@ func NewEventMarketApp(logger log.Logger, db dbm.DB) *eventMarketApp {
 	return app
 }
 
-func MakeCodec() *codec.Codec {
-	var cdc = codec.New()
-	bank.RegisterCodec(cdc)
-	auth.RegisterCodec(cdc)
-	sdk.RegisterCodec(cdc)
-	codec.RegisterCrypto(cdc)
-	eventmaker.RegisterCodec(cdc)
-	market.RegisterCodec((cdc))
-	return cdc
+// application updates every begin block
+func (app *eventMarketApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+	return app.mm.BeginBlock(ctx, req)
 }
 
-type GenesisState struct {
-	AuthData auth.GenesisState   `json:"auth"`
-	BankData bank.GenesisState   `json:"bank"`
-	Accounts []*auth.BaseAccount `json:"accounts"`
+// application updates every end block
+func (app *eventMarketApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+	return app.mm.EndBlock(ctx, req)
 }
 
-func (app *eventMarketApp) initChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	stateJSON := req.AppStateBytes
-
-	genesisState := new(GenesisState)
-	err := app.cdc.UnmarshalJSON(stateJSON, genesisState)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, acc := range genesisState.Accounts {
-		acc.AccountNumber = app.accountKeeper.GetNextAccountNumber(ctx)
-		app.accountKeeper.SetAccount(ctx, acc)
-	}
-
-	auth.InitGenesis(ctx, app.accountKeeper, app.feeCollectionKeeper, genesisState.AuthData)
-	bank.InitGenesis(ctx, app.bankKeeper, genesisState.BankData)
-
-	return abci.ResponseInitChain{}
+// application update at chain initialization
+func (app *eventMarketApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+	var genesisState GenesisState
+	app.cdc.MustUnmarshalJSON(req.AppStateBytes, &genesisState)
+	return app.mm.InitGenesis(ctx, genesisState)
 }
 
-func (app *eventMarketApp) ExportAppStateAndValidators() (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
-	ctx := app.NewContext(true, abci.Header{})
-	accounts := []*auth.BaseAccount{}
-
-	appendAccountsFn := func(acc auth.Account) bool {
-		account := &auth.BaseAccount{
-			Address: acc.GetAddress(),
-			Coins:   acc.GetCoins(),
-		}
-
-		accounts = append(accounts, account)
-		return false
-	}
-
-	app.accountKeeper.IterateAccounts(ctx, appendAccountsFn)
-
-	genState := GenesisState{
-		Accounts: accounts,
-		AuthData: auth.DefaultGenesisState(),
-		BankData: bank.DefaultGenesisState(),
-	}
-
-	appState, err = codec.MarshalJSONIndent(app.cdc, genState)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return appState, validators, err
+// load a particular height
+func (app *eventMarketApp) LoadHeight(height int64) error {
+	return app.LoadVersion(height, app.keyMain)
 }

@@ -1,33 +1,36 @@
 package cli
 
 import (
-	"strconv"
-
 	"github.com/spf13/cobra"
 
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/utils"
 	"github.com/cosmos/cosmos-sdk/codec"
-	eventTypes "github.com/marbar3778/tic_mark/types"
-	em "github.com/marbar3778/tic_mark/x/eventmaker"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+
+	types "github.com/marbar3778/tic_mark/x/eventmaker/types"
+	em "github.com/marbar3778/tic_mark/x/eventmaker"
 )
 
-// InitialPrice  sdk.Coin `json:"ticket_price"`
-// MarkUpAllowed int      `json:"mark_up_allowed"`
-// TotalTickets  int      `json:"total_tickets"`
-// TicketsSold   int      `json:"tickets_sold"`
-// Resale        bool     `json:"resale"`
-// }
-// type EventDetails struct {
-// LocationName string `json:"location_name"`
-// Address      string `json:"address"` // Address
-// City         string `json:"city"`    // City in
-// Country      string `json:"country"` // Country
-// Date         string `json:"date"`    // date of
-// }
+func (mc ModuleClient) GetTxCmd() *cobra.Command {
+	ticketTxCmd := &cobra.Command{
+		Use:   "eventmaker",
+		Short: "eventmaker tx subcommands",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	ticketTxCmd.AddCommand(client.PostCommands(
+		emd.GetCmdCreateEvent(mc.cdc),
+		emd.GetCmdNewOwner(mc.cdc),
+		emd.GetCmdCloseEvent(mc.cdc),
+	)...)
+
+	return ticketTxCmd
+}
 
 // CreateEvent(ctx sdk.Context, eventName string, totalTickets int,
 // 	eventOwner string, eventOwnerAddress sdk.AccAddress, resale bool,
@@ -41,7 +44,7 @@ func GetCmdCreateEvent(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
 
-			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			if err := cliCtx.EnsureAccountExists(); err != nil {
 				return err
@@ -57,8 +60,8 @@ func GetCmdCreateEvent(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			ticketData := eventTypes.TicketData{} // TODO: change me to correct data
-			eventData := eventTypes.EventDetails{}
+			ticketData := types.TicketData{} // TODO: change me to correct data
+			eventData := types.EventDetails{}
 
 			msg := em.NewMsgCreateEvent(args[0], num, args[3], cliCtx.GetFromAddress(), boo, ticketData, eventData)
 			err = msg.ValidateBasic()
@@ -68,7 +71,7 @@ func GetCmdCreateEvent(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx.PrintResponse = true
 
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 }
@@ -83,7 +86,7 @@ func GetCmdNewOwner(cdc *codec.Codec) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
 
-			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			if err := cliCtx.EnsureAccountExists(); err != nil {
 				return err
@@ -102,7 +105,7 @@ func GetCmdNewOwner(cdc *codec.Codec) *cobra.Command {
 
 			cliCtx.PrintResponse = true
 
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 }
@@ -116,7 +119,7 @@ func GetCmdCloseEvent(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc).WithAccountDecoder(cdc)
 			eventID := args[0]
 
-			txBldr := authtxb.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
 			if err := cliCtx.EnsureAccountExists(); err != nil {
 				return err
@@ -127,7 +130,7 @@ func GetCmdCloseEvent(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 			cliCtx.PrintResponse = true
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}, false)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
 }

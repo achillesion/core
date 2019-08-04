@@ -5,10 +5,24 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	ticketTypes "github.com/marbar3778/tic_mark/types"
+	ticketTypes "github.com/marbar3778/tic_mark/x/eventmaker/types"
 	em "github.com/marbar3778/tic_mark/x/eventmaker"
 	"github.com/spf13/cobra"
 )
+
+unc (mc ModuleClient) GetQueryCmd() *cobra.Command {
+	ticketQueryCmd := &cobra.Command{
+		Use:   "eventmaker",
+		Short: "Querying commands for the eventmaker module",
+	}
+	ticketQueryCmd.AddCommand(client.GetCommands(
+		emd.GetCmdGetOpenEvent(mc.storekey, mc.cdc),
+		emd.GetCmdGetClosedEvent(mc.storekey, mc.cdc),
+		emd.GetCmdGetOwner(mc.storekey, mc.cdc),
+	)...)
+
+	return ticketQueryCmd
+}
 
 func GetCmdGetOpenEvent(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{

@@ -5,7 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	ticketTypes "github.com/marbar3778/tic_mark/types"
+	ticketTypes "github.com/marbar3778/tic_mark/x/eventmaker/types"
 	"github.com/spf13/cobra"
 )
 

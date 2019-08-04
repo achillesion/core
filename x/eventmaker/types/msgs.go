@@ -3,12 +3,12 @@ package eventmaker
 import (
 	"fmt"
 
-	"github.com/marbar3778/tic_mark/types"
+	"github.com/marbar3778/tic_mark/x/eventmaker/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const RouterKey = "eventmaker"
+const RouterKey = ModuleName
 
 // MsgCreateEvent : Msg to create event
 type MsgCreateEvent struct {
