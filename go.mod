@@ -5,10 +5,11 @@ go 1.12
 require (
 	bou.ke/monkey v1.0.1 // indirect
 	github.com/btcsuite/btcd v0.0.0-20190213025234-306aecffea32 // indirect
-	github.com/cosmos/cosmos-sdk v0.36.0-rc1
+	github.com/cosmos/cosmos-sdk v0.37.0
 	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d // indirect
 	github.com/cosmos/sdk-application-tutorial v0.0.0-20190313150002-3616d9384466
 	github.com/ethereum/go-ethereum v1.8.23 // indirect
+	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/google/go-cmp v0.3.0
 	github.com/gorilla/mux v1.7.0
 	github.com/kr/pretty v0.1.0 // indirect
@@ -22,9 +23,8 @@ require (
 	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.3.0
 	github.com/tendermint/go-amino v0.15.0
-	github.com/tendermint/tendermint v0.32.1
+	github.com/tendermint/tendermint v0.32.2
 	github.com/tendermint/tm-db v0.1.1
 	github.com/zondax/ledger-go v0.8.0 // indirect
-	golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
