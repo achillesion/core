@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
-	app "github.com/marbar3778/tic_mark"
+	"github.com/marbar3778/tic_mark/app"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	amino "github.com/tendermint/go-amino"
@@ -23,7 +23,6 @@ const (
 	storeDT  = "de_ticket"
 )
 
-
 func main() {
 	cobra.EnableCommandSorting = false
 
@@ -34,10 +33,6 @@ func main() {
 	config.SetBech32PrefixForValidator(sdk.Bech32PrefixValAddr, sdk.Bech32PrefixValPub)
 	config.SetBech32PrefixForConsensusNode(sdk.Bech32PrefixConsAddr, sdk.Bech32PrefixConsPub)
 	config.Seal()
-
-	mc := []sdk.ModuleClients{
-		emclient.NewModuleClient(storeEM, cdc),
-	}
 
 	rootCmd := &cobra.Command{
 		Use:   "dtcli",
@@ -73,7 +68,7 @@ func registerRoutes(rs *lcd.RestServer) {
 	app.ModuleBasics.RegisterRESTRoutes(rs.CliCtx, rs.Mux)
 }
 
-func queryCmd(cdc *amino.Codec, mc []sdk.ModuleClients) *cobra.Command {
+func queryCmd(cdc *amino.Codec) *cobra.Command {
 	queryCmd := &cobra.Command{
 		Use:     "query",
 		Aliases: []string{"q"},
