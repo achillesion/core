@@ -78,7 +78,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 		cache = store.NewCommitKVStoreCacheManager()
 	}
 
-	return app.NewSimApp(
+	return app.NewApp(
 		logger, db, traceStore, true, invCheckPeriod,
 		baseapp.SetPruning(store.NewPruningOptionsFromString(viper.GetString("pruning"))),
 		baseapp.SetMinGasPrices(viper.GetString(server.FlagMinGasPrices)),
@@ -93,7 +93,7 @@ func exportAppStateAndTMValidators(
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 
 	if height != -1 {
-		dapp := app.NewSimApp(logger, db, traceStore, false, uint(1))
+		dapp := app.NewApp(logger, db, traceStore, false, uint(1))
 		err := dapp.LoadHeight(height)
 		if err != nil {
 			return nil, nil, err
@@ -101,6 +101,6 @@ func exportAppStateAndTMValidators(
 		return dapp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
 
-	dapp := app.NewSimApp(logger, db, traceStore, true, uint(1))
+	dapp := app.NewApp(logger, db, traceStore, true, uint(1))
 	return dapp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }

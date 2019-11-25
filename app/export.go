@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 )
 
-func (app *SimApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
+func (app *TicketApp) ExportAppStateAndValidators(forZeroHeight bool, jailWhiteList []string,
 ) (appState json.RawMessage, validators []tmtypes.GenesisValidator, err error) {
 	// as if they could withdraw from the start of the next block
 	ctx := app.NewContext(true, abci.Header{Height: app.LastBlockHeight()})

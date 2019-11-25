@@ -29,14 +29,14 @@ import (
 	"github.com/cosmos/modules/incubator/nft"
 )
 
-const appName = "SimApp"
+const appName = "TicketApp"
 
 var (
 	// default home directories for the application CLI
-	DefaultCLIHome = os.ExpandEnv("$HOME/.simapp")
+	DefaultCLIHome = os.ExpandEnv("$HOME/.ticketapp")
 
 	// default home directories for the application daemon
-	DefaultNodeHome = os.ExpandEnv("$HOME/.simapp")
+	DefaultNodeHome = os.ExpandEnv("$HOME/.ticketapp")
 
 	// The module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
@@ -79,7 +79,7 @@ func MakeCodec() *codec.Codec {
 // SimApp extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
 // capabilities aren't needed for testing.
-type SimApp struct {
+type TicketApp struct {
 	*bam.BaseApp
 	cdc *codec.Codec
 
@@ -110,10 +110,10 @@ type SimApp struct {
 }
 
 // NewSimApp returns a reference to an initialized SimApp.
-func NewSimApp(
+func NewApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	invCheckPeriod uint, baseAppOptions ...func(*bam.BaseApp),
-) *SimApp {
+) *TicketApp {
 	cdc := MakeCodec()
 
 	bApp := bam.NewBaseApp(appName, logger, db, auth.DefaultTxDecoder(cdc), baseAppOptions...)
@@ -125,7 +125,7 @@ func NewSimApp(
 		gov.StoreKey, params.StoreKey, nft.StoreKey)
 	tkeys := sdk.NewTransientStoreKeys(params.TStoreKey)
 
-	app := &SimApp{
+	app := &TicketApp{
 		BaseApp:        bApp,
 		cdc:            cdc,
 		invCheckPeriod: invCheckPeriod,
@@ -245,29 +245,29 @@ func NewSimApp(
 }
 
 // application updates every begin block
-func (app *SimApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *TicketApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
 
 // application updates every end block
-func (app *SimApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *TicketApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
 
 // application update at chain initialization
-func (app *SimApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *TicketApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
 	app.cdc.MustUnmarshalJSON(req.AppStateBytes, &genesisState)
 	return app.mm.InitGenesis(ctx, genesisState)
 }
 
 // load a particular height
-func (app *SimApp) LoadHeight(height int64) error {
+func (app *TicketApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keys[bam.MainStoreKey])
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
-func (app *SimApp) ModuleAccountAddrs() map[string]bool {
+func (app *TicketApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
@@ -276,18 +276,18 @@ func (app *SimApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-// Codec returns simapp's codec
-func (app *SimApp) Codec() *codec.Codec {
+// Codec returns TicketApp's codec
+func (app *TicketApp) Codec() *codec.Codec {
 	return app.cdc
 }
 
 // GetKey returns the KVStoreKey for the provided store key
-func (app *SimApp) GetKey(storeKey string) *sdk.KVStoreKey {
+func (app *TicketApp) GetKey(storeKey string) *sdk.KVStoreKey {
 	return app.keys[storeKey]
 }
 
 // GetTKey returns the TransientStoreKey for the provided store key
-func (app *SimApp) GetTKey(storeKey string) *sdk.TransientStoreKey {
+func (app *TicketApp) GetTKey(storeKey string) *sdk.TransientStoreKey {
 	return app.tkeys[storeKey]
 }
 
